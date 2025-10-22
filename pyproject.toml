@@ -1,16 +1,16 @@
 [tool.poetry]
-name = "singer-sdk"
-version = "0.9.0"
+name = "hotglue-tap-sdk"
+version = "1.0.0"
 description = "A framework for building Singer taps"
-authors = ["Meltano Team and Contributors"]
-maintainers = ["Meltano Team and Contributors"]
+authors = ["Hotglue Team and Contributors. Original work by Meltano Team and Contributors."]
+maintainers = ["Hotglue Team and Contributors"]
 readme = "README.md"
-homepage = "https://sdk.meltano.com/en/latest/"
-repository = "https://github.com/meltano/sdk"
-documentation = "https://sdk.meltano.com/en/latest/"
+homepage = "https://hotglue.com"
+repository = "https://github.com/hotglue/hotgluetapsdk"
+documentation = "https://hotglue.com"
 keywords = [
-    "Meltano",
-    "Meltano SDK",
+    "Hotglue",
+    "Hotglue SDK",
     "ELT",
 ]
 classifiers = [
@@ -26,13 +26,6 @@ classifiers = [
     "Typing :: Typed",
 ]
 license = "Apache 2.0"
-
-[tool.poetry.urls]
-"Issue Tracker" = "https://github.com/meltano/sdk/issues"
-"Twitter" = "https://twitter.com/meltanodata/"
-"Changelog" = "https://github.com/meltano/sdk/blob/main/CHANGELOG.md"
-"Slack" = "https://meltano.com/slack"
-"Youtube" = "https://www.youtube.com/meltano"
 
 [tool.poetry.dependencies]
 python = "<3.11,>=3.7.1"
@@ -52,26 +45,8 @@ sqlalchemy = "^1.4"
 python-dotenv = "^0.20.0"
 typing-extensions = "^4.2.0"
 
-# Sphinx dependencies installed as optional 'docs' extras
-# https://github.com/readthedocs/readthedocs.org/issues/4912#issuecomment-664002569
-sphinx = {version = ">=4.5,<6.0", optional = true}
-sphinx-rtd-theme = {version = ">=0.5.2,<1.1.0", optional = true}
-sphinx-copybutton = {version = ">=0.3.1,<0.6.0", optional = true}
-myst-parser = {version = ">=0.17.2,<0.19.0", optional = true}
-sphinx-autobuild = {version = "^2021.3.14", optional = true}
-
-[tool.poetry.extras]
-docs = [
-    "sphinx",
-    "sphinx-rtd-theme",
-    "sphinx-copybutton",
-    "myst-parser",
-    "sphinx-autobuild",
-]
 
 [tool.poetry.dev-dependencies]
-# snowflake-connector-python = "2.0.4" # Removed: Too many version conflicts!
-commitizen-version-bump = { git = "https://github.com/meltano/commitizen-version-bump.git", branch = "main" }
 pytest = "^7.1.2"
 xdoctest = "^1.0.2"
 mypy = "^0.971"
@@ -153,7 +128,3 @@ fail_under = 82
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-# Sample CLI declaration:
-# sdk-tap-countries-sample = 'singer_sdk.samples.sample_tap_countries.countries_tap:SampleTapCountries.cli'

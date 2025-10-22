@@ -1,1 +1,0 @@
-"""Gitlab API Sample."""
