@@ -17,9 +17,9 @@ from cryptography.hazmat.primitives.serialization import (
     PublicFormat,
 )
 
-from singer_sdk.authenticators import OAuthAuthenticator, OAuthJWTAuthenticator
-from singer_sdk.streams import RESTStream
-from singer_sdk.tap_base import Tap
+from tap_hotglue_sdk.authenticators import OAuthAuthenticator, OAuthJWTAuthenticator
+from tap_hotglue_sdk.streams import RESTStream
+from tap_hotglue_sdk.tap_base import Tap
 
 
 @pytest.mark.parametrize(

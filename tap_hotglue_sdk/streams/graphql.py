@@ -3,8 +3,8 @@
 import abc
 from typing import Any, Optional
 
-from singer_sdk.helpers._classproperty import classproperty
-from singer_sdk.streams.rest import RESTStream
+from tap_hotglue_sdk.helpers._classproperty import classproperty
+from tap_hotglue_sdk.streams.rest import RESTStream
 
 
 class GraphQLStream(RESTStream, metaclass=abc.ABCMeta):

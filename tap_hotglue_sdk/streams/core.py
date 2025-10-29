@@ -30,18 +30,18 @@ import singer
 import concurrent.futures
 from singer import RecordMessage, Schema, SchemaMessage, StateMessage
 
-from singer_sdk.exceptions import InvalidStreamSortException, MaxRecordsLimitException
-from singer_sdk.helpers._catalog import pop_deselected_record_properties
-from singer_sdk.helpers._compat import final
-from singer_sdk.helpers._flattening import get_flattening_options
-from singer_sdk.helpers._schema import SchemaPlus
-from singer_sdk.helpers._singer import (
+from tap_hotglue_sdk.exceptions import InvalidStreamSortException, MaxRecordsLimitException
+from tap_hotglue_sdk.helpers._catalog import pop_deselected_record_properties
+from tap_hotglue_sdk.helpers._compat import final
+from tap_hotglue_sdk.helpers._flattening import get_flattening_options
+from tap_hotglue_sdk.helpers._schema import SchemaPlus
+from tap_hotglue_sdk.helpers._singer import (
     Catalog,
     CatalogEntry,
     MetadataMapping,
     SelectionMask,
 )
-from singer_sdk.helpers._state import (
+from tap_hotglue_sdk.helpers._state import (
     finalize_state_progress_markers,
     get_starting_replication_value,
     get_state_partitions_list,
@@ -52,10 +52,10 @@ from singer_sdk.helpers._state import (
     write_replication_key_signpost,
     write_starting_replication_value,
 )
-from singer_sdk.helpers._typing import conform_record_data_types, is_datetime_type
-from singer_sdk.helpers._util import utc_now
-from singer_sdk.mapper import RemoveRecordTransform, SameRecordTransform, StreamMap
-from singer_sdk.plugin_base import PluginBase as TapBaseClass
+from tap_hotglue_sdk.helpers._typing import conform_record_data_types, is_datetime_type
+from tap_hotglue_sdk.helpers._util import utc_now
+from tap_hotglue_sdk.mapper import RemoveRecordTransform, SameRecordTransform, StreamMap
+from tap_hotglue_sdk.plugin_base import PluginBase as TapBaseClass
 
 # Replication methods
 REPLICATION_FULL_TABLE = "FULL_TABLE"
@@ -203,7 +203,7 @@ class Stream(metaclass=abc.ABCMeta):
 
         Developers should use this method to seed incremental processing for
         non-datetime replication keys. For datetime and date replication keys, use
-        :meth:`~singer_sdk.Stream.get_starting_timestamp()`
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_timestamp()`
 
         Args:
             context: Stream partition or context dictionary.
@@ -226,7 +226,7 @@ class Stream(metaclass=abc.ABCMeta):
 
         Developers should use this method to seed incremental processing for date
         and datetime replication keys. For non-datetime replication keys, use
-        :meth:`~singer_sdk.Stream.get_starting_replication_key_value()`
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_replication_key_value()`
 
         Args:
             context: Stream partition or context dictionary.
@@ -598,9 +598,9 @@ class Stream(metaclass=abc.ABCMeta):
         This method is internal to the SDK and should not need to be overridden.
         Developers may access this property but this is not recommended except in
         advanced use cases. Instead, developers should access the latest stream
-        replication key values using :meth:`~singer_sdk.Stream.get_starting_timestamp()`
+        replication key values using :meth:`~tap_hotglue_sdk.Stream.get_starting_timestamp()`
         for timestamp keys, or
-        :meth:`~singer_sdk.Stream.get_starting_replication_key_value()` for
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_replication_key_value()` for
         non-timestamp keys.
 
         Returns:
@@ -618,12 +618,12 @@ class Stream(metaclass=abc.ABCMeta):
         Developers may access this property but this is not recommended except in
         advanced use cases. Instead, developers should access the latest stream
         replication key values using
-        :meth:`~singer_sdk.Stream.get_starting_timestamp()` for timestamp keys, or
-        :meth:`~singer_sdk.Stream.get_starting_replication_key_value()` for
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_timestamp()` for timestamp keys, or
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_replication_key_value()` for
         non-timestamp keys.
 
         Partition level may be overridden by
-        :attr:`~singer_sdk.Stream.state_partitioning_keys` if set.
+        :attr:`~tap_hotglue_sdk.Stream.state_partitioning_keys` if set.
 
         Args:
             context: Stream partition or context dictionary.
@@ -648,9 +648,9 @@ class Stream(metaclass=abc.ABCMeta):
         This method is internal to the SDK and should not need to be overridden.
         Developers may access this property but this is not recommended except in
         advanced use cases. Instead, developers should access the latest stream
-        replication key values using :meth:`~singer_sdk.Stream.get_starting_timestamp()`
+        replication key values using :meth:`~tap_hotglue_sdk.Stream.get_starting_timestamp()`
         for timestamp keys, or
-        :meth:`~singer_sdk.Stream.get_starting_replication_key_value()` for
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_replication_key_value()` for
         non-timestamp keys.
 
         A blank state entry will be created if one doesn't already exist.

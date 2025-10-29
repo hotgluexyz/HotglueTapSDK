@@ -11,7 +11,7 @@ import pytest
 def gitlab_config() -> Optional[dict]:
     """Create a tap-gitlab config object."""
     config: Optional[dict] = None
-    path = Path("singer_sdk/tests/external/.secrets/gitlab-config.json")
+    path = Path("tap_hotglue_sdk/tests/external/.secrets/gitlab-config.json")
 
     if path.exists():
         config = json.loads(path.read_text())
@@ -23,7 +23,7 @@ def gitlab_config() -> Optional[dict]:
 def ga_config() -> Optional[dict]:
     """Create a tap-google-analytics config object."""
     config: Optional[dict] = None
-    path = Path("singer_sdk/tests/external/.secrets/google-analytics-config.json")
+    path = Path("tap_hotglue_sdk/tests/external/.secrets/google-analytics-config.json")
 
     if path.exists():
         config = json.loads(path.read_text())

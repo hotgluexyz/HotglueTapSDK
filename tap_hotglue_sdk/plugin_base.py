@@ -23,22 +23,22 @@ from typing import (
 import click
 from jsonschema import Draft4Validator, SchemaError, ValidationError
 
-from singer_sdk.configuration._dict_config import parse_environment_config
-from singer_sdk.exceptions import ConfigValidationError
-from singer_sdk.helpers._classproperty import classproperty
-from singer_sdk.helpers._compat import metadata
-from singer_sdk.helpers._secrets import SecretString, is_common_secret_key
-from singer_sdk.helpers._util import read_json_file
-from singer_sdk.helpers.capabilities import (
+from tap_hotglue_sdk.configuration._dict_config import parse_environment_config
+from tap_hotglue_sdk.exceptions import ConfigValidationError
+from tap_hotglue_sdk.helpers._classproperty import classproperty
+from tap_hotglue_sdk.helpers._compat import metadata
+from tap_hotglue_sdk.helpers._secrets import SecretString, is_common_secret_key
+from tap_hotglue_sdk.helpers._util import read_json_file
+from tap_hotglue_sdk.helpers.capabilities import (
     FLATTENING_CONFIG,
     STREAM_MAPS_CONFIG,
     CapabilitiesEnum,
     PluginCapabilities,
 )
-from singer_sdk.mapper import PluginMapper
-from singer_sdk.typing import extend_validator_with_defaults
+from tap_hotglue_sdk.mapper import PluginMapper
+from tap_hotglue_sdk.typing import extend_validator_with_defaults
 
-SDK_PACKAGE_NAME = "singer_sdk"
+SDK_PACKAGE_NAME = "tap_hotglue_sdk"
 
 
 JSONSchemaValidator = extend_validator_with_defaults(Draft4Validator)

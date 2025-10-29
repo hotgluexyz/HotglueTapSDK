@@ -4,7 +4,7 @@ import abc
 import datetime
 import uuid
 
-from singer_sdk.sinks.core import Sink
+from tap_hotglue_sdk.sinks.core import Sink
 
 
 class BatchSink(Sink):
@@ -57,10 +57,10 @@ class BatchSink(Sink):
 
         If this method is not overridden, the default implementation will create a
         `context["records"]` list and append all records for processing during
-        :meth:`~singer_sdk.BatchSink.process_batch()`.
+        :meth:`~tap_hotglue_sdk.BatchSink.process_batch()`.
 
         If duplicates are merged, these can be tracked via
-        :meth:`~singer_sdk.Sink.tally_duplicate_merged()`.
+        :meth:`~tap_hotglue_sdk.Sink.tally_duplicate_merged()`.
 
         Args:
             record: Individual record in the stream.
@@ -77,12 +77,12 @@ class BatchSink(Sink):
 
         This method must be overridden.
 
-        If :meth:`~singer_sdk.BatchSink.process_record()` is not overridden,
+        If :meth:`~tap_hotglue_sdk.BatchSink.process_record()` is not overridden,
         the `context["records"]` list will contain all records from the given batch
         context.
 
         If duplicates are merged, these can be tracked via
-        :meth:`~singer_sdk.Sink.tally_duplicate_merged()`.
+        :meth:`~tap_hotglue_sdk.Sink.tally_duplicate_merged()`.
 
         Args:
             context: Stream partition or context dictionary.

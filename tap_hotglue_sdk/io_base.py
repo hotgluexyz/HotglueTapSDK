@@ -11,7 +11,7 @@ from collections import Counter, defaultdict
 from typing import IO
 from typing import Counter as CounterType
 
-from singer_sdk.helpers._compat import final
+from tap_hotglue_sdk.helpers._compat import final
 
 logger = logging.getLogger(__name__)
 

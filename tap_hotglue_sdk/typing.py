@@ -47,8 +47,8 @@ from typing import Generic, Mapping, TypeVar, Union, cast
 import sqlalchemy
 from jsonschema import validators
 
-from singer_sdk.helpers._classproperty import classproperty
-from singer_sdk.helpers._typing import append_type, get_datelike_property_type
+from tap_hotglue_sdk.helpers._classproperty import classproperty
+from tap_hotglue_sdk.helpers._typing import append_type, get_datelike_property_type
 
 if sys.version_info >= (3, 10):
     from typing import TypeAlias
