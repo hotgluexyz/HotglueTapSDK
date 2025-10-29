@@ -27,6 +27,8 @@ from typing import (
 import pendulum
 import requests
 import singer
+import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 from singer import RecordMessage, Schema, SchemaMessage, StateMessage
 
 from singer_sdk.exceptions import InvalidStreamSortException, MaxRecordsLimitException
@@ -75,6 +77,7 @@ class Stream(metaclass=abc.ABCMeta):
     # Used for nested stream relationships
     parent_stream_type: Optional[Type["Stream"]] = None
     ignore_parent_replication_key: bool = False
+    child_paralellization_limit: int = 1
 
     # Internal API cost aggregator
     _sync_costs: Dict[str, int] = {}
@@ -968,6 +971,33 @@ class Stream(metaclass=abc.ABCMeta):
 
         finalize_state_progress_markers(state)
 
+    def get_child_threads(self) -> int:
+        """Get the number of child threads to use.
+
+        Returns:
+            The number of child threads to use.
+        """
+        highest_parallelization_limit = 1
+        for child_stream in self.child_streams:
+            if (child_stream.selected or child_stream.has_selected_descendents) and child_stream.parallelization_limit > 0:
+                if child_stream.parallelization_limit > highest_parallelization_limit:
+                    highest_parallelization_limit = child_stream.parallelization_limit
+        return highest_parallelization_limit
+
+    def _sync_children_with_threads(self, child_context: list[dict]) -> None:
+        requests_no = len(child_context)
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=requests_no
+        ) as executor:
+            futures = {
+                executor.submit(self._sync_children, x): x for x in child_context
+            }
+            # Process each future as it completes
+            for future in concurrent.futures.as_completed(futures):
+                # Yield records
+                if future.result():
+                    yield future.result()
+    
     # Private sync methods:
 
     def _sync_records(  # noqa C901  # too complex
@@ -996,6 +1026,16 @@ class Stream(metaclass=abc.ABCMeta):
             child_context: Optional[dict] = (
                 None if current_context is None else copy.copy(current_context)
             )
+
+            # check if any of the child streams have a parallelization limit greater than 1
+            child_threads = self.get_child_threads()
+            # if the number of child threads is greater than 1, we need to use threads
+            use_threads = False
+            if child_threads > 1:
+                use_threads = True
+            # create a list of child contexts to use for parallelization
+            paralellization_context = []
+
             for record_result in self.get_records(current_context):
                 if isinstance(record_result, tuple):
                     # Tuple items should be the record and the child context
@@ -1012,7 +1052,14 @@ class Stream(metaclass=abc.ABCMeta):
 
                 # Sync children, except when primary mapper filters out the record
                 if self.stream_maps[0].get_filter_result(record):
-                    self._sync_children(child_context)
+                    # if use_threads is True and the number of child contexts in the list is less than the number of child threads, add the child context to the list
+                    if use_threads and len(paralellization_context) < child_threads:
+                        paralellization_context.append(child_context)
+                        if len(paralellization_context) == child_threads:
+                            self._sync_children_with_threads(paralellization_context)
+                            paralellization_context = []
+                    else:
+                        self._sync_children(child_context)
                 self._check_max_record_limit(record_count)
                 if selected:
                     if (record_count - 1) % self.STATE_MSG_FREQUENCY == 0:
