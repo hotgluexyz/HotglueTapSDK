@@ -28,7 +28,6 @@ import pendulum
 import requests
 import singer
 import concurrent.futures
-from concurrent.futures import ThreadPoolExecutor
 from singer import RecordMessage, Schema, SchemaMessage, StateMessage
 
 from singer_sdk.exceptions import InvalidStreamSortException, MaxRecordsLimitException
