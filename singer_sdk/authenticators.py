@@ -18,6 +18,10 @@ from singer import utils
 from singer_sdk.helpers._util import utc_now
 from singer_sdk.streams import Stream as RESTStreamBase
 
+import threading
+
+_token_lock = threading.Lock()
+
 
 class SingletonMeta(type):
     """A general purpose singleton metaclass."""
@@ -329,8 +333,9 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         Returns:
             HTTP headers for authentication.
         """
-        if not self.is_token_valid():
-            self.update_access_token()
+        with _token_lock:
+            if not self.is_token_valid():
+                self.update_access_token()
         result = super().auth_headers
         result["Authorization"] = f"Bearer {self.access_token}"
         return result
