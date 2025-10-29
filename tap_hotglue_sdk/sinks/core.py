@@ -10,13 +10,13 @@ from typing import Any, Dict, List, Mapping, Optional, Union
 from dateutil import parser
 from jsonschema import Draft4Validator, FormatChecker
 
-from singer_sdk.helpers._compat import final
-from singer_sdk.helpers._typing import (
+from tap_hotglue_sdk.helpers._compat import final
+from tap_hotglue_sdk.helpers._typing import (
     DatetimeErrorTreatmentEnum,
     get_datelike_property_type,
     handle_invalid_timestamp_in_record,
 )
-from singer_sdk.plugin_base import PluginBase
+from tap_hotglue_sdk.plugin_base import PluginBase
 
 JSONSchemaValidator = Draft4Validator
 
@@ -132,8 +132,8 @@ class Sink(metaclass=abc.ABCMeta):
         """Increment the records written tally.
 
         This method is called automatically by the SDK after
-        :meth:`~singer_sdk.Sink.process_record()`
-        or :meth:`~singer_sdk.Sink.process_batch()`.
+        :meth:`~tap_hotglue_sdk.Sink.process_record()`
+        or :meth:`~tap_hotglue_sdk.Sink.process_batch()`.
 
         Args:
             count: Number to increase record count by.
@@ -337,13 +337,13 @@ class Sink(metaclass=abc.ABCMeta):
         Implementations may either load to the `context` dict for staging (the
         default behavior for Batch types), or permanently write out to the target.
 
-        Anything appended to :attr:`singer_sdk.Sink.records_to_drain` will be
+        Anything appended to :attr:`tap_hotglue_sdk.Sink.records_to_drain` will be
         automatically passed to
-        :meth:`~singer_sdk.Sink.process_batch()` to be permanently written during the
+        :meth:`~tap_hotglue_sdk.Sink.process_batch()` to be permanently written during the
         process_batch operation.
 
         If duplicates are merged, these can be tracked via
-        :meth:`~singer_sdk.Sink.tally_duplicate_merged()`.
+        :meth:`~tap_hotglue_sdk.Sink.tally_duplicate_merged()`.
 
         Args:
             record: Individual record in the stream.

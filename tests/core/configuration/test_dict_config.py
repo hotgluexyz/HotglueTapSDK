@@ -5,8 +5,8 @@ from unittest import mock
 
 import pytest
 
-import singer_sdk.typing as th
-from singer_sdk.configuration._dict_config import (
+import tap_hotglue_sdk.typing as th
+from tap_hotglue_sdk.configuration._dict_config import (
     merge_config_sources,
     parse_environment_config,
 )

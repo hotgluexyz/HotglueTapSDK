@@ -19,10 +19,10 @@ except ImportError:
     {sys.executable} -m pip install nox-poetry"""
     raise SystemExit(dedent(message)) from None
 
-package = "singer_sdk"
+package = "tap_hotglue_sdk"
 python_versions = ["3.10", "3.9", "3.8", "3.7"]
 main_python_version = "3.10"
-locations = "singer_sdk", "tests", "noxfile.py", "docs/conf.py"
+locations = "tap_hotglue_sdk", "tests", "noxfile.py", "docs/conf.py"
 nox.options.sessions = (
     "mypy",
     "tests",
@@ -33,7 +33,7 @@ nox.options.sessions = (
 @session(python=python_versions)
 def mypy(session: Session) -> None:
     """Check types with mypy."""
-    args = session.posargs or ["singer_sdk"]
+    args = session.posargs or ["tap_hotglue_sdk"]
     session.install(".")
     session.install(
         "mypy",

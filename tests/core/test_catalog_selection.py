@@ -5,13 +5,13 @@ from copy import deepcopy
 
 import pytest
 
-import singer_sdk.helpers._singer as singer
-from singer_sdk.helpers._catalog import (
+import tap_hotglue_sdk.helpers._singer as singer
+from tap_hotglue_sdk.helpers._catalog import (
     get_selected_schema,
     pop_deselected_record_properties,
 )
-from singer_sdk.helpers._schema import SchemaPlus
-from singer_sdk.typing import ObjectType, PropertiesList, Property, StringType
+from tap_hotglue_sdk.helpers._schema import SchemaPlus
+from tap_hotglue_sdk.typing import ObjectType, PropertiesList, Property, StringType
 
 
 @pytest.fixture

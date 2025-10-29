@@ -7,7 +7,7 @@ from typing import Any, Dict
 import pendulum
 import pytest
 
-from singer_sdk.helpers._typing import (
+from tap_hotglue_sdk.helpers._typing import (
     conform_record_data_types,
     get_datelike_property_type,
     to_json_compatible,

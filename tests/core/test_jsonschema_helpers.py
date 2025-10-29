@@ -5,9 +5,9 @@ from typing import List
 
 import pytest
 
-from singer_sdk.streams.core import Stream
-from singer_sdk.tap_base import Tap
-from singer_sdk.typing import (
+from tap_hotglue_sdk.streams.core import Stream
+from tap_hotglue_sdk.tap_base import Tap
+from tap_hotglue_sdk.typing import (
     ArrayType,
     BooleanType,
     CustomType,
@@ -257,7 +257,7 @@ def test_wrapped_type_dict():
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "Type dict for <class 'singer_sdk.typing.ArrayType'> is not defined. "
+            "Type dict for <class 'tap_hotglue_sdk.typing.ArrayType'> is not defined. "
             + "Try instantiating it with a nested type such as ArrayType(StringType)."
         ),
     ):
@@ -266,7 +266,7 @@ def test_wrapped_type_dict():
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "Type dict for <class 'singer_sdk.typing.ObjectType'> is not defined. "
+            "Type dict for <class 'tap_hotglue_sdk.typing.ObjectType'> is not defined. "
             + "Try instantiating it with a nested type such as ObjectType(StringType)."
         ),
     ):

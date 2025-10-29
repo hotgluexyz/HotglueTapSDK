@@ -1,13 +1,13 @@
-"""Run the generic tests from `singer_sdk.testing`."""
+"""Run the generic tests from `tap_hotglue_sdk.testing`."""
 
 from pathlib import Path
 from typing import Optional
 
 from samples.sample_tap_gitlab.gitlab_tap import SampleTapGitlab
 from samples.sample_tap_google_analytics.ga_tap import SampleTapGoogleAnalytics
-from singer_sdk.testing import get_standard_tap_tests
+from tap_hotglue_sdk.testing import get_standard_tap_tests
 
-GA_CONFIG_FILE = Path("singer_sdk/tests/external/.secrets/google-analytics-config.json")
+GA_CONFIG_FILE = Path("tap_hotglue_sdk/tests/external/.secrets/google-analytics-config.json")
 
 
 def test_gitlab_tap_standard_tests(gitlab_config: Optional[dict]):

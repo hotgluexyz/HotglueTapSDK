@@ -12,15 +12,15 @@ from typing import IO, Callable, Counter, Dict, List, Optional, Tuple, Type, Uni
 import click
 from joblib import Parallel, delayed, parallel_backend
 
-from singer_sdk.cli import common_options
-from singer_sdk.exceptions import RecordsWitoutSchemaException
-from singer_sdk.helpers._classproperty import classproperty
-from singer_sdk.helpers._compat import final
-from singer_sdk.helpers.capabilities import CapabilitiesEnum, PluginCapabilities
-from singer_sdk.io_base import SingerMessageType, SingerReader
-from singer_sdk.mapper import PluginMapper
-from singer_sdk.plugin_base import PluginBase
-from singer_sdk.sinks import Sink
+from tap_hotglue_sdk.cli import common_options
+from tap_hotglue_sdk.exceptions import RecordsWitoutSchemaException
+from tap_hotglue_sdk.helpers._classproperty import classproperty
+from tap_hotglue_sdk.helpers._compat import final
+from tap_hotglue_sdk.helpers.capabilities import CapabilitiesEnum, PluginCapabilities
+from tap_hotglue_sdk.io_base import SingerMessageType, SingerReader
+from tap_hotglue_sdk.mapper import PluginMapper
+from tap_hotglue_sdk.plugin_base import PluginBase
+from tap_hotglue_sdk.sinks import Sink
 
 _MAX_PARALLELISM = 8
 
@@ -135,7 +135,7 @@ class Target(PluginBase, SingerReader, metaclass=abc.ABCMeta):
         sink depending on the values within the `record` object. Otherwise, please see
         `default_sink_class` property and/or the `get_sink_class()` method.
 
-        Raises :class:`singer_sdk.exceptions.RecordsWitoutSchemaException` if sink does
+        Raises :class:`tap_hotglue_sdk.exceptions.RecordsWitoutSchemaException` if sink does
         not exist and schema is not sent.
 
         Args:
@@ -179,7 +179,7 @@ class Target(PluginBase, SingerReader, metaclass=abc.ABCMeta):
             stream_name: Name of the stream.
 
         Raises:
-            ValueError: If no :class:`singer_sdk.sinks.Sink` class is defined.
+            ValueError: If no :class:`tap_hotglue_sdk.sinks.Sink` class is defined.
 
         Returns:
             The sink class to be used with the stream.
@@ -410,7 +410,7 @@ class Target(PluginBase, SingerReader, metaclass=abc.ABCMeta):
 
         Args:
             is_endofpipe: This is passed by the
-                          :meth:`~singer_sdk.Sink._process_endofpipe()` which
+                          :meth:`~tap_hotglue_sdk.Sink._process_endofpipe()` which
                           is called after the target instance has finished
                           listening to the stdin
         """

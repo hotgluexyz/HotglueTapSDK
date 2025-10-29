@@ -2,7 +2,7 @@
 
 import pytest
 
-from singer_sdk.helpers import _state
+from tap_hotglue_sdk.helpers import _state
 
 
 @pytest.fixture

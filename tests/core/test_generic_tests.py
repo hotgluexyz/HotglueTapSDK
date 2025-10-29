@@ -1,9 +1,9 @@
-"""Test the generic tests from `singer_sdk.testing`."""
+"""Test the generic tests from `tap_hotglue_sdk.testing`."""
 
 from pathlib import Path
 
 from samples.sample_tap_countries.countries_tap import SampleTapCountries
-from singer_sdk.testing import get_standard_tap_tests
+from tap_hotglue_sdk.testing import get_standard_tap_tests
 
 PARQUET_SAMPLE_FILENAME = Path(__file__).parent / Path("./resources/testfile.parquet")
 PARQUET_TEST_CONFIG = {"filepath": str(PARQUET_SAMPLE_FILENAME)}

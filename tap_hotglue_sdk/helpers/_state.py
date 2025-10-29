@@ -3,8 +3,8 @@
 import datetime
 from typing import Any, Callable, List, Optional, Union, cast
 
-from singer_sdk.exceptions import InvalidStreamSortException
-from singer_sdk.helpers._typing import to_json_compatible
+from tap_hotglue_sdk.exceptions import InvalidStreamSortException
+from tap_hotglue_sdk.helpers._typing import to_json_compatible
 
 PROGRESS_MARKERS = "progress_markers"
 PROGRESS_MARKER_NOTE = "Note"

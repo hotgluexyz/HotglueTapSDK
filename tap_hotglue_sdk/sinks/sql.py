@@ -7,9 +7,9 @@ import sqlalchemy
 from pendulum import now
 from sqlalchemy.sql.expression import bindparam
 
-from singer_sdk.plugin_base import PluginBase
-from singer_sdk.sinks.batch import BatchSink
-from singer_sdk.streams.sql import SQLConnector
+from tap_hotglue_sdk.plugin_base import PluginBase
+from tap_hotglue_sdk.sinks.batch import BatchSink
+from tap_hotglue_sdk.streams.sql import SQLConnector
 
 
 class SQLSink(BatchSink):
@@ -104,7 +104,7 @@ class SQLSink(BatchSink):
             context: Stream partition or context dictionary.
         """
         # If duplicates are merged, these can be tracked via
-        # :meth:`~singer_sdk.Sink.tally_duplicate_merged()`.
+        # :meth:`~tap_hotglue_sdk.Sink.tally_duplicate_merged()`.
         self.connector.prepare_table(
             full_table_name=self.full_table_name,
             schema=self.schema,

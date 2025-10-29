@@ -2,8 +2,8 @@
 
 import abc
 
-from singer_sdk.helpers._compat import final
-from singer_sdk.sinks.core import Sink
+from tap_hotglue_sdk.helpers._compat import final
+from tap_hotglue_sdk.sinks.core import Sink
 
 
 class RecordSink(Sink):
@@ -57,7 +57,7 @@ class RecordSink(Sink):
         prior to returning.
 
         If duplicates are merged/skipped instead of being loaded, merges can be
-        tracked via :meth:`~singer_sdk.Sink.tally_duplicate_merged()`.
+        tracked via :meth:`~tap_hotglue_sdk.Sink.tally_duplicate_merged()`.
 
         Args:
             record: Individual record in the stream.

@@ -24,7 +24,7 @@ repos:
     exclude: |
         (?x)^(
             .bumpversion.cfg|
-            singer_sdk/helpers/_simpleeval.py|
+            tap_hotglue_sdk/helpers/_simpleeval.py|
             tests/core/test_simpleeval.py
         )$
 
@@ -35,7 +35,7 @@ repos:
     exclude: |
         (?x)^(
             cookiecutter/.*|
-            singer_sdk/helpers/_simpleeval.py|
+            tap_hotglue_sdk/helpers/_simpleeval.py|
             tests/core/test_simpleeval.py
         )$
 
@@ -43,7 +43,7 @@ repos:
   rev: 5.10.1
   hooks:
   - id: isort
-    exclude: (cookiecutter/.*|singer_sdk/helpers/_simpleeval/.*)
+    exclude: (cookiecutter/.*|tap_hotglue_sdk/helpers/_simpleeval/.*)
 
 - repo: https://github.com/pycqa/flake8
   rev: 5.0.4
@@ -53,7 +53,7 @@ repos:
     - darglint==1.8.1
     - flake8-annotations==2.9.0
     - flake8-docstrings==1.6.0
-    files: 'singer_sdk/.*'
+    files: 'tap_hotglue_sdk/.*'
 
 - repo: https://github.com/asottile/pyupgrade
   rev: v2.37.3
@@ -62,6 +62,6 @@ repos:
     args: [--py37-plus]
     exclude: |
         (?x)^(
-            singer_sdk/helpers/_simpleeval.py|
+            tap_hotglue_sdk/helpers/_simpleeval.py|
             tests/core/test_simpleeval.py
         )$

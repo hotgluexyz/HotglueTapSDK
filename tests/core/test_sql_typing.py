@@ -3,7 +3,7 @@
 import pytest
 import sqlalchemy
 
-from singer_sdk import typing as th
+from tap_hotglue_sdk import typing as th
 
 
 @pytest.mark.parametrize(
