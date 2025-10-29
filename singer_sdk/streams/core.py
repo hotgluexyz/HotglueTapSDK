@@ -76,7 +76,7 @@ class Stream(metaclass=abc.ABCMeta):
     # Used for nested stream relationships
     parent_stream_type: Optional[Type["Stream"]] = None
     ignore_parent_replication_key: bool = False
-    child_paralellization_limit: int = 1
+    parallelization_limit: int = 1
 
     # Internal API cost aggregator
     _sync_costs: Dict[str, int] = {}
@@ -1052,8 +1052,11 @@ class Stream(metaclass=abc.ABCMeta):
                 # Sync children, except when primary mapper filters out the record
                 if self.stream_maps[0].get_filter_result(record):
                     # if use_threads is True and the number of child contexts in the list is less than the number of child threads, add the child context to the list
-                    if use_threads and len(paralellization_context) < child_threads:
-                        paralellization_context.append(child_context)
+                    if use_threads:
+                        # if the number of child contexts in the list is less than the number of child threads, add the child context to the list
+                        if len(paralellization_context) < child_threads:
+                            paralellization_context.append(child_context)
+                        # if the number of child contexts in the list is equal to the number of child threads, sync the children with threads
                         if len(paralellization_context) == child_threads:
                             self._sync_children_with_threads(paralellization_context)
                             paralellization_context = []
