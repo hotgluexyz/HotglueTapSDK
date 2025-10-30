@@ -994,8 +994,7 @@ class Stream(metaclass=abc.ABCMeta):
             # Process each future as it completes
             for future in concurrent.futures.as_completed(futures):
                 # Yield records
-                if future.result():
-                    yield future.result()
+                future.result()
     
     # Private sync methods:
 
@@ -1083,6 +1082,11 @@ class Stream(metaclass=abc.ABCMeta):
 
                 record_count += 1
                 partition_record_count += 1
+            
+            # if parallelization context is not empty, sync the children with threads
+            if use_threads and len(paralellization_context) > 0:
+                self._sync_children_with_threads(paralellization_context)
+                paralellization_context = []
             if current_context == state_partition_context:
                 # Finalize per-partition state only if 1:1 with context
                 finalize_state_progress_markers(state)
