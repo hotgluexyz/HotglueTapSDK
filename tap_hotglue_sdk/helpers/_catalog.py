@@ -6,8 +6,8 @@ from typing import Any, Dict, Optional, Tuple
 
 from memoization import cached
 
-from singer_sdk.helpers._singer import Catalog, SelectionMask
-from singer_sdk.helpers._typing import is_object_type
+from tap_hotglue_sdk.helpers._singer import Catalog, SelectionMask
+from tap_hotglue_sdk.helpers._typing import is_object_type
 
 _MAX_LRU_CACHE = 500
 

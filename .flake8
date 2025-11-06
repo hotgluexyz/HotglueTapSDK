@@ -8,9 +8,9 @@ per-file-ignores =
     # Don't require docstrings conventions or type annotations in SDK samples
     # samples/*:ANN,DAR
     # Don't require docstrings conventions or type annotations in private modules
-    singer_sdk/helpers/_*.py:ANN,DAR,D105
+    tap_hotglue_sdk/helpers/_*.py:ANN,DAR,D105
     # Don't require docstrings conventions in "meta" code
-    # singer_sdk/helpers/_classproperty.py:D105
+    # tap_hotglue_sdk/helpers/_classproperty.py:D105
 max-complexity = 10
 docstring-convention = google
 allow-star-arg-any = true

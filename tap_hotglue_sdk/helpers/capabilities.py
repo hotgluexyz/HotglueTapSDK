@@ -6,7 +6,7 @@ from enum import Enum, EnumMeta
 from typing import Any, TypeVar
 from warnings import warn
 
-from singer_sdk.typing import (
+from tap_hotglue_sdk.typing import (
     BooleanType,
     IntegerType,
     ObjectType,

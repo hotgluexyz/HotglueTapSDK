@@ -11,17 +11,17 @@ import hashlib
 import logging
 from typing import Any, Callable
 
-from singer_sdk.exceptions import MapExpressionError, StreamMapConfigError
-from singer_sdk.helpers import _simpleeval as simpleeval
-from singer_sdk.helpers._catalog import get_selected_schema
-from singer_sdk.helpers._flattening import (
+from tap_hotglue_sdk.exceptions import MapExpressionError, StreamMapConfigError
+from tap_hotglue_sdk.helpers import _simpleeval as simpleeval
+from tap_hotglue_sdk.helpers._catalog import get_selected_schema
+from tap_hotglue_sdk.helpers._flattening import (
     FlatteningOptions,
     flatten_record,
     flatten_schema,
     get_flattening_options,
 )
-from singer_sdk.helpers._singer import Catalog
-from singer_sdk.typing import (
+from tap_hotglue_sdk.helpers._singer import Catalog
+from tap_hotglue_sdk.typing import (
     CustomType,
     IntegerType,
     JSONTypeHelper,

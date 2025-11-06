@@ -7,10 +7,10 @@ from freezegun import freeze_time
 from samples.sample_mapper.mapper import StreamTransform
 from samples.sample_tap_countries.countries_tap import SampleTapCountries
 from samples.sample_target_csv.csv_target import SampleTargetCSV
-from singer_sdk import typing as th
-from singer_sdk.sinks import BatchSink
-from singer_sdk.target_base import Target
-from singer_sdk.testing import (
+from tap_hotglue_sdk import typing as th
+from tap_hotglue_sdk.sinks import BatchSink
+from tap_hotglue_sdk.target_base import Target
+from tap_hotglue_sdk.testing import (
     sync_end_to_end,
     tap_sync_test,
     tap_to_target_sync_test,

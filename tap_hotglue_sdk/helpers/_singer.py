@@ -6,7 +6,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, cast
 from singer.catalog import Catalog as BaseCatalog
 from singer.catalog import CatalogEntry as BaseCatalogEntry
 
-from singer_sdk.helpers._schema import SchemaPlus
+from tap_hotglue_sdk.helpers._schema import SchemaPlus
 
 Breadcrumb = Tuple[str, ...]
 

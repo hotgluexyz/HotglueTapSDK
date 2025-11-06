@@ -1,18 +1,18 @@
 """SDK for building singer-compliant Singer taps."""
 
-from singer_sdk import streams
-from singer_sdk.mapper_base import InlineMapper
-from singer_sdk.plugin_base import PluginBase
-from singer_sdk.sinks import BatchSink, RecordSink, Sink, SQLSink
-from singer_sdk.streams import (
+from tap_hotglue_sdk import streams
+from tap_hotglue_sdk.mapper_base import InlineMapper
+from tap_hotglue_sdk.plugin_base import PluginBase
+from tap_hotglue_sdk.sinks import BatchSink, RecordSink, Sink, SQLSink
+from tap_hotglue_sdk.streams import (
     GraphQLStream,
     RESTStream,
     SQLConnector,
     SQLStream,
     Stream,
 )
-from singer_sdk.tap_base import SQLTap, Tap
-from singer_sdk.target_base import SQLTarget, Target
+from tap_hotglue_sdk.tap_base import SQLTap, Tap
+from tap_hotglue_sdk.target_base import SQLTarget, Target
 
 __all__ = [
     "BatchSink",

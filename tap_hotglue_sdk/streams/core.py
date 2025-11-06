@@ -27,20 +27,21 @@ from typing import (
 import pendulum
 import requests
 import singer
+import concurrent.futures
 from singer import RecordMessage, Schema, SchemaMessage, StateMessage
 
-from singer_sdk.exceptions import InvalidStreamSortException, MaxRecordsLimitException
-from singer_sdk.helpers._catalog import pop_deselected_record_properties
-from singer_sdk.helpers._compat import final
-from singer_sdk.helpers._flattening import get_flattening_options
-from singer_sdk.helpers._schema import SchemaPlus
-from singer_sdk.helpers._singer import (
+from tap_hotglue_sdk.exceptions import InvalidStreamSortException, MaxRecordsLimitException
+from tap_hotglue_sdk.helpers._catalog import pop_deselected_record_properties
+from tap_hotglue_sdk.helpers._compat import final
+from tap_hotglue_sdk.helpers._flattening import get_flattening_options
+from tap_hotglue_sdk.helpers._schema import SchemaPlus
+from tap_hotglue_sdk.helpers._singer import (
     Catalog,
     CatalogEntry,
     MetadataMapping,
     SelectionMask,
 )
-from singer_sdk.helpers._state import (
+from tap_hotglue_sdk.helpers._state import (
     finalize_state_progress_markers,
     get_starting_replication_value,
     get_state_partitions_list,
@@ -51,10 +52,10 @@ from singer_sdk.helpers._state import (
     write_replication_key_signpost,
     write_starting_replication_value,
 )
-from singer_sdk.helpers._typing import conform_record_data_types, is_datetime_type
-from singer_sdk.helpers._util import utc_now
-from singer_sdk.mapper import RemoveRecordTransform, SameRecordTransform, StreamMap
-from singer_sdk.plugin_base import PluginBase as TapBaseClass
+from tap_hotglue_sdk.helpers._typing import conform_record_data_types, is_datetime_type
+from tap_hotglue_sdk.helpers._util import utc_now
+from tap_hotglue_sdk.mapper import RemoveRecordTransform, SameRecordTransform, StreamMap
+from tap_hotglue_sdk.plugin_base import PluginBase as TapBaseClass
 
 # Replication methods
 REPLICATION_FULL_TABLE = "FULL_TABLE"
@@ -75,6 +76,7 @@ class Stream(metaclass=abc.ABCMeta):
     # Used for nested stream relationships
     parent_stream_type: Optional[Type["Stream"]] = None
     ignore_parent_replication_key: bool = False
+    parallelization_limit: int = 1
 
     # Internal API cost aggregator
     _sync_costs: Dict[str, int] = {}
@@ -201,7 +203,7 @@ class Stream(metaclass=abc.ABCMeta):
 
         Developers should use this method to seed incremental processing for
         non-datetime replication keys. For datetime and date replication keys, use
-        :meth:`~singer_sdk.Stream.get_starting_timestamp()`
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_timestamp()`
 
         Args:
             context: Stream partition or context dictionary.
@@ -224,7 +226,7 @@ class Stream(metaclass=abc.ABCMeta):
 
         Developers should use this method to seed incremental processing for date
         and datetime replication keys. For non-datetime replication keys, use
-        :meth:`~singer_sdk.Stream.get_starting_replication_key_value()`
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_replication_key_value()`
 
         Args:
             context: Stream partition or context dictionary.
@@ -596,9 +598,9 @@ class Stream(metaclass=abc.ABCMeta):
         This method is internal to the SDK and should not need to be overridden.
         Developers may access this property but this is not recommended except in
         advanced use cases. Instead, developers should access the latest stream
-        replication key values using :meth:`~singer_sdk.Stream.get_starting_timestamp()`
+        replication key values using :meth:`~tap_hotglue_sdk.Stream.get_starting_timestamp()`
         for timestamp keys, or
-        :meth:`~singer_sdk.Stream.get_starting_replication_key_value()` for
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_replication_key_value()` for
         non-timestamp keys.
 
         Returns:
@@ -616,12 +618,12 @@ class Stream(metaclass=abc.ABCMeta):
         Developers may access this property but this is not recommended except in
         advanced use cases. Instead, developers should access the latest stream
         replication key values using
-        :meth:`~singer_sdk.Stream.get_starting_timestamp()` for timestamp keys, or
-        :meth:`~singer_sdk.Stream.get_starting_replication_key_value()` for
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_timestamp()` for timestamp keys, or
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_replication_key_value()` for
         non-timestamp keys.
 
         Partition level may be overridden by
-        :attr:`~singer_sdk.Stream.state_partitioning_keys` if set.
+        :attr:`~tap_hotglue_sdk.Stream.state_partitioning_keys` if set.
 
         Args:
             context: Stream partition or context dictionary.
@@ -646,9 +648,9 @@ class Stream(metaclass=abc.ABCMeta):
         This method is internal to the SDK and should not need to be overridden.
         Developers may access this property but this is not recommended except in
         advanced use cases. Instead, developers should access the latest stream
-        replication key values using :meth:`~singer_sdk.Stream.get_starting_timestamp()`
+        replication key values using :meth:`~tap_hotglue_sdk.Stream.get_starting_timestamp()`
         for timestamp keys, or
-        :meth:`~singer_sdk.Stream.get_starting_replication_key_value()` for
+        :meth:`~tap_hotglue_sdk.Stream.get_starting_replication_key_value()` for
         non-timestamp keys.
 
         A blank state entry will be created if one doesn't already exist.
@@ -968,6 +970,32 @@ class Stream(metaclass=abc.ABCMeta):
 
         finalize_state_progress_markers(state)
 
+    def get_child_threads(self) -> int:
+        """Get the number of child threads to use.
+
+        Returns:
+            The number of child threads to use.
+        """
+        highest_parallelization_limit = 1
+        for child_stream in self.child_streams:
+            if (child_stream.selected or child_stream.has_selected_descendents) and child_stream.parallelization_limit > 0:
+                if child_stream.parallelization_limit > highest_parallelization_limit:
+                    highest_parallelization_limit = child_stream.parallelization_limit
+        return highest_parallelization_limit
+
+    def _sync_children_with_threads(self, child_context: list[dict]) -> None:
+        requests_no = len(child_context)
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=requests_no
+        ) as executor:
+            futures = {
+                executor.submit(self._sync_children, x): x for x in child_context
+            }
+            # Process each future as it completes
+            for future in concurrent.futures.as_completed(futures):
+                # Yield records
+                future.result()
+    
     # Private sync methods:
 
     def _sync_records(  # noqa C901  # too complex
@@ -996,6 +1024,16 @@ class Stream(metaclass=abc.ABCMeta):
             child_context: Optional[dict] = (
                 None if current_context is None else copy.copy(current_context)
             )
+
+            # check if any of the child streams have a parallelization limit greater than 1
+            child_threads = self.get_child_threads()
+            # if the number of child threads is greater than 1, we need to use threads
+            use_threads = False
+            if child_threads > 1:
+                use_threads = True
+            # create a list of child contexts to use for parallelization
+            paralellization_context = []
+
             for record_result in self.get_records(current_context):
                 if isinstance(record_result, tuple):
                     # Tuple items should be the record and the child context
@@ -1012,7 +1050,17 @@ class Stream(metaclass=abc.ABCMeta):
 
                 # Sync children, except when primary mapper filters out the record
                 if self.stream_maps[0].get_filter_result(record):
-                    self._sync_children(child_context)
+                    # if use_threads is True and the number of child contexts in the list is less than the number of child threads, add the child context to the list
+                    if use_threads:
+                        # if the number of child contexts in the list is less than the number of child threads, add the child context to the list
+                        if len(paralellization_context) < child_threads:
+                            paralellization_context.append(child_context)
+                        # if the number of child contexts in the list is equal to the number of child threads, sync the children with threads
+                        if len(paralellization_context) == child_threads:
+                            self._sync_children_with_threads(paralellization_context)
+                            paralellization_context = []
+                    else:
+                        self._sync_children(child_context)
                 self._check_max_record_limit(record_count)
                 if selected:
                     if (record_count - 1) % self.STATE_MSG_FREQUENCY == 0:
@@ -1034,6 +1082,11 @@ class Stream(metaclass=abc.ABCMeta):
 
                 record_count += 1
                 partition_record_count += 1
+            
+            # if parallelization context is not empty, sync the children with threads
+            if use_threads and len(paralellization_context) > 0:
+                self._sync_children_with_threads(paralellization_context)
+                paralellization_context = []
             if current_context == state_partition_context:
                 # Finalize per-partition state only if 1:1 with context
                 finalize_state_progress_markers(state)

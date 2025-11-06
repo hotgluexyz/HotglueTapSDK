@@ -15,8 +15,12 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from singer import utils
 
-from singer_sdk.helpers._util import utc_now
-from singer_sdk.streams import Stream as RESTStreamBase
+from tap_hotglue_sdk.helpers._util import utc_now
+from tap_hotglue_sdk.streams import Stream as RESTStreamBase
+
+import threading
+
+_token_lock = threading.Lock()
 
 
 class SingletonMeta(type):
@@ -196,7 +200,7 @@ class APIKeyAuthenticator(APIAuthenticatorBase):
 
         Returns:
             APIKeyAuthenticator: A new
-                :class:`singer_sdk.authenticators.APIKeyAuthenticator` instance.
+                :class:`tap_hotglue_sdk.authenticators.APIKeyAuthenticator` instance.
         """
         return cls(stream=stream, key=key, value=value, location=location)
 
@@ -235,7 +239,7 @@ class BearerTokenAuthenticator(APIAuthenticatorBase):
 
         Returns:
             BearerTokenAuthenticator: A new
-                :class:`singer_sdk.authenticators.BearerTokenAuthenticator` instance.
+                :class:`tap_hotglue_sdk.authenticators.BearerTokenAuthenticator` instance.
         """
         return cls(stream=stream, token=token)
 
@@ -286,7 +290,7 @@ class BasicAuthenticator(APIAuthenticatorBase):
 
         Returns:
             BasicAuthenticator: A new
-                :class:`singer_sdk.authenticators.BasicAuthenticator` instance.
+                :class:`tap_hotglue_sdk.authenticators.BasicAuthenticator` instance.
         """
         return cls(stream=stream, username=username, password=password)
 
@@ -330,7 +334,10 @@ class OAuthAuthenticator(APIAuthenticatorBase):
             HTTP headers for authentication.
         """
         if not self.is_token_valid():
-            self.update_access_token()
+            with _token_lock:
+                self.logger.info(f"[{threading.current_thread.__name__}] Token expired, locking and attempting to refresh token.")
+                if not self.is_token_valid():
+                    self.update_access_token()
         result = super().auth_headers
         result["Authorization"] = f"Bearer {self.access_token}"
         return result
