@@ -10,8 +10,8 @@ from enum import Enum
 import pytest
 import requests
 
-from tap_hotglue_sdk.exceptions import FatalAPIError, RetriableAPIError
-from tap_hotglue_sdk.streams.rest import RESTStream
+from hotglue_tap_sdk.exceptions import FatalAPIError, RetriableAPIError
+from hotglue_tap_sdk.streams.rest import RESTStream
 
 
 class CustomResponseValidationStream(RESTStream):

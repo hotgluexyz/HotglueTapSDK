@@ -10,12 +10,12 @@ import sqlalchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
 
-from tap_hotglue_sdk import typing as th
-from tap_hotglue_sdk.exceptions import ConfigValidationError
-from tap_hotglue_sdk.helpers._schema import SchemaPlus
-from tap_hotglue_sdk.helpers._singer import CatalogEntry, MetadataMapping
-from tap_hotglue_sdk.plugin_base import PluginBase as TapBaseClass
-from tap_hotglue_sdk.streams.core import Stream
+from hotglue_tap_sdk import typing as th
+from hotglue_tap_sdk.exceptions import ConfigValidationError
+from hotglue_tap_sdk.helpers._schema import SchemaPlus
+from hotglue_tap_sdk.helpers._singer import CatalogEntry, MetadataMapping
+from hotglue_tap_sdk.plugin_base import PluginBase as TapBaseClass
+from hotglue_tap_sdk.streams.core import Stream
 
 
 class SQLConnector:

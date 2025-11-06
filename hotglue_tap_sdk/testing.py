@@ -4,10 +4,10 @@ import io
 from contextlib import redirect_stderr, redirect_stdout
 from typing import Callable, List, Optional, Tuple, Type, cast
 
-from tap_hotglue_sdk.helpers import _singer
-from tap_hotglue_sdk.mapper_base import InlineMapper
-from tap_hotglue_sdk.tap_base import Tap
-from tap_hotglue_sdk.target_base import Target
+from hotglue_tap_sdk.helpers import _singer
+from hotglue_tap_sdk.mapper_base import InlineMapper
+from hotglue_tap_sdk.tap_base import Tap
+from hotglue_tap_sdk.target_base import Target
 
 
 def get_standard_tap_tests(tap_class: Type[Tap], config: dict = None) -> List[Callable]:

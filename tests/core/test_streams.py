@@ -7,18 +7,18 @@ import pendulum
 import pytest
 import requests
 
-from tap_hotglue_sdk.helpers._classproperty import classproperty
-from tap_hotglue_sdk.helpers._singer import Catalog, CatalogEntry, MetadataMapping
-from tap_hotglue_sdk.helpers.jsonpath import _compile_jsonpath
-from tap_hotglue_sdk.streams.core import (
+from hotglue_tap_sdk.helpers._classproperty import classproperty
+from hotglue_tap_sdk.helpers._singer import Catalog, CatalogEntry, MetadataMapping
+from hotglue_tap_sdk.helpers.jsonpath import _compile_jsonpath
+from hotglue_tap_sdk.streams.core import (
     REPLICATION_FULL_TABLE,
     REPLICATION_INCREMENTAL,
     Stream,
 )
-from tap_hotglue_sdk.streams.graphql import GraphQLStream
-from tap_hotglue_sdk.streams.rest import RESTStream
-from tap_hotglue_sdk.tap_base import Tap
-from tap_hotglue_sdk.typing import (
+from hotglue_tap_sdk.streams.graphql import GraphQLStream
+from hotglue_tap_sdk.streams.rest import RESTStream
+from hotglue_tap_sdk.tap_base import Tap
+from hotglue_tap_sdk.typing import (
     DateTimeType,
     IntegerType,
     PropertiesList,

@@ -3,9 +3,9 @@
 import pytest
 from memoization.memoization import cached
 
-from tap_hotglue_sdk.authenticators import APIAuthenticatorBase, SingletonMeta
-from tap_hotglue_sdk.streams import RESTStream
-from tap_hotglue_sdk.tap_base import Tap
+from hotglue_tap_sdk.authenticators import APIAuthenticatorBase, SingletonMeta
+from hotglue_tap_sdk.streams import RESTStream
+from hotglue_tap_sdk.tap_base import Tap
 
 
 class SingletonAuthenticator(APIAuthenticatorBase, metaclass=SingletonMeta):

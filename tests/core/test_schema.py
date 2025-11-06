@@ -29,7 +29,7 @@ Some might need more thinking if they can contain schemas (though, note that we 
 'anyOf' and' patternProperties' as SIMPLE even though they can contain schemas.
 """
 
-from tap_hotglue_sdk.helpers._schema import SchemaPlus
+from hotglue_tap_sdk.helpers._schema import SchemaPlus
 
 
 def test_simple_schema():

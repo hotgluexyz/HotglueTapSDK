@@ -17,9 +17,9 @@ from cryptography.hazmat.primitives.serialization import (
     PublicFormat,
 )
 
-from tap_hotglue_sdk.authenticators import OAuthAuthenticator, OAuthJWTAuthenticator
-from tap_hotglue_sdk.streams import RESTStream
-from tap_hotglue_sdk.tap_base import Tap
+from hotglue_tap_sdk.authenticators import OAuthAuthenticator, OAuthJWTAuthenticator
+from hotglue_tap_sdk.streams import RESTStream
+from hotglue_tap_sdk.tap_base import Tap
 
 
 @pytest.mark.parametrize(

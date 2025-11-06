@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import pytest
 
-from tap_hotglue_sdk.helpers._singer import Catalog, CatalogEntry, Metadata, MetadataMapping
+from hotglue_tap_sdk.helpers._singer import Catalog, CatalogEntry, Metadata, MetadataMapping
 
 
 def test_catalog_parsing():

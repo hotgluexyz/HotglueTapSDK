@@ -7,12 +7,12 @@ from typing import Callable, Iterable, List, Tuple
 import click
 import singer
 
-from tap_hotglue_sdk.cli import common_options
-from tap_hotglue_sdk.configuration._dict_config import merge_config_sources
-from tap_hotglue_sdk.helpers._classproperty import classproperty
-from tap_hotglue_sdk.helpers.capabilities import CapabilitiesEnum, PluginCapabilities
-from tap_hotglue_sdk.io_base import SingerReader
-from tap_hotglue_sdk.plugin_base import PluginBase
+from hotglue_tap_sdk.cli import common_options
+from hotglue_tap_sdk.configuration._dict_config import merge_config_sources
+from hotglue_tap_sdk.helpers._classproperty import classproperty
+from hotglue_tap_sdk.helpers.capabilities import CapabilitiesEnum, PluginCapabilities
+from hotglue_tap_sdk.io_base import SingerReader
+from hotglue_tap_sdk.plugin_base import PluginBase
 
 
 class InlineMapper(PluginBase, SingerReader, metaclass=abc.ABCMeta):

@@ -13,11 +13,11 @@ import backoff
 import requests
 from singer.schema import Schema
 
-from tap_hotglue_sdk.authenticators import APIAuthenticatorBase, SimpleAuthenticator
-from tap_hotglue_sdk.exceptions import FatalAPIError, RetriableAPIError
-from tap_hotglue_sdk.helpers.jsonpath import extract_jsonpath
-from tap_hotglue_sdk.plugin_base import PluginBase as TapBaseClass
-from tap_hotglue_sdk.streams.core import Stream
+from hotglue_tap_sdk.authenticators import APIAuthenticatorBase, SimpleAuthenticator
+from hotglue_tap_sdk.exceptions import FatalAPIError, RetriableAPIError
+from hotglue_tap_sdk.helpers.jsonpath import extract_jsonpath
+from hotglue_tap_sdk.plugin_base import PluginBase as TapBaseClass
+from hotglue_tap_sdk.streams.core import Stream
 
 DEFAULT_PAGE_SIZE = 1000
 DEFAULT_REQUEST_TIMEOUT = 300  # 5 minutes
@@ -136,14 +136,14 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         Checks for error status codes and wether they are fatal or retriable.
 
         In case an error is deemed transient and can be safely retried, then this
-        method should raise an :class:`tap_hotglue_sdk.exceptions.RetriableAPIError`.
+        method should raise an :class:`hotglue_tap_sdk.exceptions.RetriableAPIError`.
         By default this applies to 5xx error codes, along with values set in:
-        :attr:`~tap_hotglue_sdk.RESTStream.extra_retry_statuses`
+        :attr:`~hotglue_tap_sdk.RESTStream.extra_retry_statuses`
 
         In case an error is unrecoverable raises a
-        :class:`tap_hotglue_sdk.exceptions.FatalAPIError`. By default, this applies to
+        :class:`hotglue_tap_sdk.exceptions.FatalAPIError`. By default, this applies to
         4xx errors, excluding values found in:
-        :attr:`~tap_hotglue_sdk.RESTStream.extra_retry_statuses`
+        :attr:`~hotglue_tap_sdk.RESTStream.extra_retry_statuses`
 
         Tap developers are encouraged to override this method if their APIs use HTTP
         status codes in non-conventional ways, or if they communicate errors

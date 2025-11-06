@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "tap-hotglue-sdk"
+name = "hotglue-tap-sdk"
 version = "1.0.0"
 description = "A framework for building Singer taps"
 authors = ["Hotglue Team and Contributors. Original work by Meltano Team and Contributors."]
@@ -74,11 +74,11 @@ exclude = ".*simpleeval.*"
 [tool.isort]
 profile = "black"
 multi_line_output = 3 # Vertical Hanging Indent
-src_paths = "tap_hotglue_sdk"
+src_paths = "hotglue_tap_sdk"
 known_first_party = ["tests", "samples"]
 
 [tool.pytest.ini_options]
-addopts = '-vvv --ignore=tap_hotglue_sdk/helpers/_simpleeval.py -m "not external"'
+addopts = '-vvv --ignore=hotglue_tap_sdk/helpers/_simpleeval.py -m "not external"'
 markers = [
     "external: Tests relying on external resources",
 ]
@@ -90,15 +90,15 @@ tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
     "docs/conf.py",
     "pyproject.toml:^version =",
-    "cookiecutter/tap-template/{{cookiecutter.tap_id}}/pyproject.toml:tap-hotglue-sdk",
-    "cookiecutter/target-template/{{cookiecutter.target_id}}/pyproject.toml:tap-hotglue-sdk",
+    "cookiecutter/tap-template/{{cookiecutter.tap_id}}/pyproject.toml:hotglue-tap-sdk",
+    "cookiecutter/target-template/{{cookiecutter.target_id}}/pyproject.toml:hotglue-tap-sdk",
     ".github/ISSUE_TEMPLATE/bug.yml:^      placeholder:",
 ]
 
 [tool.coverage.paths]
 source = [
-    "tap_hotglue_sdk/",
-    "*/tap_hotglue_sdk",
+    "hotglue_tap_sdk/",
+    "*/hotglue_tap_sdk",
 ]
 tests = [
     "tests/",
@@ -107,11 +107,11 @@ tests = [
 
 [tool.coverage.run]
 branch = true
-source = ["tap_hotglue_sdk", "tests"]
+source = ["hotglue_tap_sdk", "tests"]
 omit = [
     "tests/*",
     "samples/*",
-    "tap_hotglue_sdk/helpers/_compat.py",
+    "hotglue_tap_sdk/helpers/_compat.py",
 ]
 
 [tool.coverage.report]

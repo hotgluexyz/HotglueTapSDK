@@ -16,8 +16,8 @@ import sys
 import unittest
 import warnings
 
-from tap_hotglue_sdk.helpers import _simpleeval as simpleeval
-from tap_hotglue_sdk.helpers._simpleeval import (
+from hotglue_tap_sdk.helpers import _simpleeval as simpleeval
+from hotglue_tap_sdk.helpers._simpleeval import (
     AttributeDoesNotExist,
     EvalWithCompoundTypes,
     FeatureNotAvailable,

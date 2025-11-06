@@ -15,8 +15,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from singer import utils
 
-from tap_hotglue_sdk.helpers._util import utc_now
-from tap_hotglue_sdk.streams import Stream as RESTStreamBase
+from hotglue_tap_sdk.helpers._util import utc_now
+from hotglue_tap_sdk.streams import Stream as RESTStreamBase
 
 import threading
 
@@ -200,7 +200,7 @@ class APIKeyAuthenticator(APIAuthenticatorBase):
 
         Returns:
             APIKeyAuthenticator: A new
-                :class:`tap_hotglue_sdk.authenticators.APIKeyAuthenticator` instance.
+                :class:`hotglue_tap_sdk.authenticators.APIKeyAuthenticator` instance.
         """
         return cls(stream=stream, key=key, value=value, location=location)
 
@@ -239,7 +239,7 @@ class BearerTokenAuthenticator(APIAuthenticatorBase):
 
         Returns:
             BearerTokenAuthenticator: A new
-                :class:`tap_hotglue_sdk.authenticators.BearerTokenAuthenticator` instance.
+                :class:`hotglue_tap_sdk.authenticators.BearerTokenAuthenticator` instance.
         """
         return cls(stream=stream, token=token)
 
@@ -290,7 +290,7 @@ class BasicAuthenticator(APIAuthenticatorBase):
 
         Returns:
             BasicAuthenticator: A new
-                :class:`tap_hotglue_sdk.authenticators.BasicAuthenticator` instance.
+                :class:`hotglue_tap_sdk.authenticators.BasicAuthenticator` instance.
         """
         return cls(stream=stream, username=username, password=password)
 

@@ -4,7 +4,7 @@ import copy
 import logging
 
 from samples.sample_tap_countries.countries_tap import SampleTapCountries
-from tap_hotglue_sdk.helpers._catalog import (
+from hotglue_tap_sdk.helpers._catalog import (
     get_selected_schema,
     pop_deselected_record_properties,
 )

@@ -2,7 +2,7 @@
 
 import pytest
 
-from tap_hotglue_sdk.helpers import _state
+from hotglue_tap_sdk.helpers import _state
 
 
 @pytest.fixture

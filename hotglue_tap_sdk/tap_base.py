@@ -8,22 +8,22 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, cast
 
 import click
 
-from tap_hotglue_sdk.cli import common_options
-from tap_hotglue_sdk.exceptions import MaxRecordsLimitException
-from tap_hotglue_sdk.helpers import _state
-from tap_hotglue_sdk.helpers._classproperty import classproperty
-from tap_hotglue_sdk.helpers._compat import final
-from tap_hotglue_sdk.helpers._singer import Catalog
-from tap_hotglue_sdk.helpers._state import write_stream_state
-from tap_hotglue_sdk.helpers._util import read_json_file
-from tap_hotglue_sdk.helpers.capabilities import (
+from hotglue_tap_sdk.cli import common_options
+from hotglue_tap_sdk.exceptions import MaxRecordsLimitException
+from hotglue_tap_sdk.helpers import _state
+from hotglue_tap_sdk.helpers._classproperty import classproperty
+from hotglue_tap_sdk.helpers._compat import final
+from hotglue_tap_sdk.helpers._singer import Catalog
+from hotglue_tap_sdk.helpers._state import write_stream_state
+from hotglue_tap_sdk.helpers._util import read_json_file
+from hotglue_tap_sdk.helpers.capabilities import (
     CapabilitiesEnum,
     PluginCapabilities,
     TapCapabilities,
 )
-from tap_hotglue_sdk.mapper import PluginMapper
-from tap_hotglue_sdk.plugin_base import PluginBase
-from tap_hotglue_sdk.streams import SQLStream, Stream
+from hotglue_tap_sdk.mapper import PluginMapper
+from hotglue_tap_sdk.plugin_base import PluginBase
+from hotglue_tap_sdk.streams import SQLStream, Stream
 
 STREAM_MAPS_CONFIG = "stream_maps"
 
@@ -242,7 +242,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         """Return a Catalog object.
 
         Returns:
-            :class:`tap_hotglue_sdk.helpers._singer.Catalog`.
+            :class:`hotglue_tap_sdk.helpers._singer.Catalog`.
         """
         return Catalog(
             (stream.tap_stream_id, stream._singer_catalog_entry)
