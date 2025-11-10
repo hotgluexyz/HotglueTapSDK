@@ -305,6 +305,7 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         auth_endpoint: str | None = None,
         oauth_scopes: str | None = None,
         default_expiration: int | None = None,
+        config_file: str | None = None,
     ) -> None:
         """Create a new authenticator.
 
@@ -324,6 +325,8 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         self.refresh_token: str | None = None
         self.last_refreshed: datetime | None = None
         self.expires_in: int | None = None
+        self._config_file = config_file
+        self._tap = stream._tap
 
     @property
     def auth_headers(self) -> dict:
