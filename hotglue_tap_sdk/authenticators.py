@@ -429,11 +429,15 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         Returns:
             True if the token is valid (fresh).
         """
+        # if expires_in is not set, try to get it from the tap config
+        if self.expires_in is None and self._tap.config.get("expires_in"):
+            self.expires_in = self._tap.config.get("expires_in")
+
         if self.last_refreshed is None:
             return False
         if not self.expires_in:
             return True
-        if self.expires_in > (utils.now() - self.last_refreshed).total_seconds():
+        if self.expires_in - (utils.now()).total_seconds() > 120:
             return True
         return False
 
@@ -456,7 +460,7 @@ class OAuthAuthenticator(APIAuthenticatorBase):
             )
         token_json = token_response.json()
         self.access_token = token_json["access_token"]
-        self.expires_in = token_json.get("expires_in", self._default_expiration)
+        self.expires_in = token_json.get("expires_in", self._default_expiration) + request_time.total_seconds()
         if self.expires_in is None:
             self.logger.debug(
                 "No expires_in receied in OAuth response and no "
