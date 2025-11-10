@@ -119,7 +119,8 @@ class Stream(metaclass=abc.ABCMeta):
         self._mask: Optional[SelectionMask] = None
         self._schema: dict
         self.child_streams: List[Stream] = []
-        self.minimum_start_time: Optional[datetime.datetime] = None
+        self._minimum_start_time: Optional[datetime.datetime] = None
+
         if schema:
             if isinstance(schema, (PathLike, str)):
                 if not Path(schema).is_file():
@@ -473,6 +474,14 @@ class Stream(metaclass=abc.ABCMeta):
             new_value: TODO
         """
         self._replication_key = new_value
+    
+    @property
+    def minimum_start_time(self) -> Optional[datetime.datetime]:
+        return self._minimum_start_time if hasattr(self, "_minimum_start_time") else None
+
+    @minimum_start_time.setter
+    def minimum_start_time(self, value: Optional[datetime.datetime]):
+        self._minimum_start_time = value
 
     @property
     def is_sorted(self) -> bool:
