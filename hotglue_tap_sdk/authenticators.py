@@ -8,6 +8,7 @@ import math
 from datetime import datetime, timedelta
 from types import MappingProxyType
 from typing import Any, Mapping
+import json
 
 import jwt
 import requests
@@ -441,7 +442,6 @@ class OAuthAuthenticator(APIAuthenticatorBase):
             return True
         return False
 
-    # Authentication and refresh
     def update_access_token(self) -> None:
         """Update `access_token` along with: `last_refreshed` and `expires_in`.
 
@@ -468,7 +468,17 @@ class OAuthAuthenticator(APIAuthenticatorBase):
                 "expires."
             )
         self.last_refreshed = request_time
+        # Update the tap config with the new access_token and refresh_token
+        self._tap._config["access_token"] = token_json["access_token"]
+        self._tap._config["expires_in"] = self.expires_in
+        if token_json.get("refresh_token"):
+            #Log the refresh_token
+            self._tap.logger.info(f"Latest refresh token: {token_json.get('refresh_token')}")
+            self._tap._config["refresh_token"] = token_json["refresh_token"]
 
+        # Write the updated config back to the file
+        with open(self._tap.config_file, "w") as outfile:
+            json.dump(self._tap._config, outfile, indent=4)
 
 class OAuthJWTAuthenticator(OAuthAuthenticator):
     """API Authenticator for OAuth 2.0 flows which utilize a JWT refresh token."""

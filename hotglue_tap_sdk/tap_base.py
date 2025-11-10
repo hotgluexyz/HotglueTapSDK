@@ -76,6 +76,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         self._input_catalog: Optional[Catalog] = None
         self._state: Dict[str, Stream] = {}
         self._catalog: Optional[Catalog] = None  # Tap's working catalog
+        self.config_file = config[0] if config else None
 
         # Process input catalog
         if isinstance(catalog, Catalog):
