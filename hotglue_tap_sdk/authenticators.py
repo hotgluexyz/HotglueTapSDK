@@ -444,6 +444,10 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         if self.expires_in - (utils.now()).total_seconds() > 120:
             return True
         return False
+    
+    def request_auth(self) -> tuple[str, str]:
+        """Return the authentication credentials for the request."""
+        return None
 
     def update_access_token(self) -> None:
         """Update `access_token` along with: `last_refreshed` and `expires_in`.
@@ -453,7 +457,7 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         """
         request_time = utc_now()
         auth_request_payload = self.oauth_request_payload
-        token_response = requests.post(self.auth_endpoint, data=auth_request_payload)
+        token_response = requests.post(self.auth_endpoint, data=auth_request_payload, auth=self.request_auth())
         try:
             token_response.raise_for_status()
             self.logger.info("OAuth authorization attempt was successful.")
@@ -463,7 +467,7 @@ class OAuthAuthenticator(APIAuthenticatorBase):
             )
         token_json = token_response.json()
         self.access_token = token_json["access_token"]
-        self.expires_in = token_json.get("expires_in", self._default_expiration) + request_time.total_seconds()
+        self.expires_in = token_json.get("expires_in", self._default_expiration) + int(request_time.timestamp())
         if self.expires_in is None:
             self.logger.debug(
                 "No expires_in receied in OAuth response and no "
