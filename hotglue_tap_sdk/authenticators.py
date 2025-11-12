@@ -8,6 +8,7 @@ import math
 from datetime import datetime, timedelta
 from types import MappingProxyType
 from typing import Any, Mapping
+import json
 
 import jwt
 import requests
@@ -304,6 +305,7 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         auth_endpoint: str | None = None,
         oauth_scopes: str | None = None,
         default_expiration: int | None = None,
+        config_file: str | None = None,
     ) -> None:
         """Create a new authenticator.
 
@@ -323,6 +325,8 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         self.refresh_token: str | None = None
         self.last_refreshed: datetime | None = None
         self.expires_in: int | None = None
+        self._config_file = config_file
+        self._tap = stream._tap
 
     @property
     def auth_headers(self) -> dict:
@@ -429,15 +433,22 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         Returns:
             True if the token is valid (fresh).
         """
+        # if expires_in is not set, try to get it from the tap config
+        if self.expires_in is None and self._tap.config.get("expires_in"):
+            self.expires_in = self._tap.config.get("expires_in")
+
         if self.last_refreshed is None:
             return False
         if not self.expires_in:
             return True
-        if self.expires_in > (utils.now() - self.last_refreshed).total_seconds():
+        if self.expires_in - int(utils.now().timestamp()) > 120:
             return True
         return False
+    
+    def request_auth(self) -> tuple[str, str]:
+        """Return the authentication credentials for the request."""
+        return None
 
-    # Authentication and refresh
     def update_access_token(self) -> None:
         """Update `access_token` along with: `last_refreshed` and `expires_in`.
 
@@ -446,7 +457,7 @@ class OAuthAuthenticator(APIAuthenticatorBase):
         """
         request_time = utc_now()
         auth_request_payload = self.oauth_request_payload
-        token_response = requests.post(self.auth_endpoint, data=auth_request_payload)
+        token_response = requests.post(self.auth_endpoint, data=auth_request_payload, auth=self.request_auth())
         try:
             token_response.raise_for_status()
             self.logger.info("OAuth authorization attempt was successful.")
@@ -456,7 +467,7 @@ class OAuthAuthenticator(APIAuthenticatorBase):
             )
         token_json = token_response.json()
         self.access_token = token_json["access_token"]
-        self.expires_in = token_json.get("expires_in", self._default_expiration)
+        self.expires_in = token_json.get("expires_in", self._default_expiration) + int(request_time.timestamp())
         if self.expires_in is None:
             self.logger.debug(
                 "No expires_in receied in OAuth response and no "
@@ -464,7 +475,17 @@ class OAuthAuthenticator(APIAuthenticatorBase):
                 "expires."
             )
         self.last_refreshed = request_time
+        # Update the tap config with the new access_token and refresh_token
+        self._tap._config["access_token"] = token_json["access_token"]
+        self._tap._config["expires_in"] = self.expires_in
+        if token_json.get("refresh_token"):
+            #Log the refresh_token
+            self._tap.logger.info(f"Latest refresh token: {token_json.get('refresh_token')}")
+            self._tap._config["refresh_token"] = token_json["refresh_token"]
 
+        # Write the updated config back to the file
+        with open(self._tap.config_file, "w") as outfile:
+            json.dump(self._tap._config, outfile, indent=4)
 
 class OAuthJWTAuthenticator(OAuthAuthenticator):
     """API Authenticator for OAuth 2.0 flows which utilize a JWT refresh token."""
