@@ -508,12 +508,17 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         Yields:
             One item per (possibly processed) record in the API.
         """
-        for record in self.request_records(context):
-            transformed_record = self.post_process(record, context)
-            if transformed_record is None:
-                # Record filtered out during post_process()
-                continue
-            yield transformed_record
+        context = context or {}
+        paging_windows = self.get_paging_windows(context) or [{}]
+        for paging_window in paging_windows:
+            window_context = context.copy()
+            window_context.update(paging_window)
+            for record in self.request_records(window_context):
+                transformed_record = self.post_process(record, window_context)
+                if transformed_record is None:
+                    # Record filtered out during post_process()
+                    continue
+                yield transformed_record
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result rows.

@@ -507,6 +507,17 @@ class Stream(metaclass=abc.ABCMeta):
         """
         return True
 
+
+
+    def get_paging_windows(self, context: Optional[dict]) -> List[Dict[str, Any]]:
+        """
+        Generate list of paging windows to be added to each context.
+
+        Returns:
+            A list of paging windows to be added to each context.
+        """
+        return []
+
     @property
     def metadata(self) -> MetadataMapping:
         """Get stream metadata.
