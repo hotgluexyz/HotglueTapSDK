@@ -1160,6 +1160,7 @@ class Stream(metaclass=abc.ABCMeta):
     def _sync_children(self, child_context: dict) -> None:
         for child_stream in self.child_streams:
             if child_stream.selected or child_stream.has_selected_descendents:
+                child_stream.state_partitioning_keys = list(child_context.keys())
                 child_stream.sync(context=child_context)
 
     # Overridable Methods
@@ -1197,7 +1198,7 @@ class Stream(metaclass=abc.ABCMeta):
             return None
 
         if self.state_partitioning_keys is None:
-            return context
+            return None
 
         return {k: v for k, v in context.items() if k in self.state_partitioning_keys}
 
