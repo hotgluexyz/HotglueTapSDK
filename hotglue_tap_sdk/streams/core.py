@@ -1015,7 +1015,7 @@ class Stream(metaclass=abc.ABCMeta):
                     highest_parallelization_limit = child_stream.parallelization_limit
         return highest_parallelization_limit
 
-    def _sync_children_with_threads(self, child_context: list[dict]) -> None:
+    def _sync_children_with_threads(self, child_context: List[Dict]) -> None:
         requests_no = len(child_context)
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=requests_no
