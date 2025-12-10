@@ -879,7 +879,7 @@ class Stream(metaclass=abc.ABCMeta):
 
         if extra_tags:
             metric["tags"].update(extra_tags)
-        self._metric_logging_function(f"INFO METRIC: {json.dumps(metric)}")
+        self._metric_logging_function(f"INFO METRIC: {str(metric)}")
 
     def _write_record_count_log(
         self, record_count: int, context: Optional[dict]
@@ -1015,7 +1015,7 @@ class Stream(metaclass=abc.ABCMeta):
                     highest_parallelization_limit = child_stream.parallelization_limit
         return highest_parallelization_limit
 
-    def _sync_children_with_threads(self, child_context: list[dict]) -> None:
+    def _sync_children_with_threads(self, child_context: List[Dict]) -> None:
         requests_no = len(child_context)
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=requests_no
@@ -1160,6 +1160,10 @@ class Stream(metaclass=abc.ABCMeta):
     def _sync_children(self, child_context: dict) -> None:
         for child_stream in self.child_streams:
             if child_stream.selected or child_stream.has_selected_descendents:
+                child_stream.state_partitioning_keys = list(
+                    set(child_stream.state_partitioning_keys or [])
+                    | set(child_context.keys())
+                )
                 child_stream.sync(context=child_context)
 
     # Overridable Methods
@@ -1197,7 +1201,7 @@ class Stream(metaclass=abc.ABCMeta):
             return None
 
         if self.state_partitioning_keys is None:
-            return context
+            return None
 
         return {k: v for k, v in context.items() if k in self.state_partitioning_keys}
 
