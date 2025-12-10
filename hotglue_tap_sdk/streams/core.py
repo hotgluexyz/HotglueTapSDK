@@ -879,7 +879,7 @@ class Stream(metaclass=abc.ABCMeta):
 
         if extra_tags:
             metric["tags"].update(extra_tags)
-        self._metric_logging_function(f"INFO METRIC: {json.dumps(metric)}")
+        self._metric_logging_function(f"INFO METRIC: {str(metric)}")
 
     def _write_record_count_log(
         self, record_count: int, context: Optional[dict]
