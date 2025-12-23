@@ -251,11 +251,14 @@ class Stream(metaclass=abc.ABCMeta):
 
         return cast(datetime.datetime, pendulum.parse(value))
     
-    def get_starting_time(self, context):
+    def get_starting_time(self, context, is_inclusive=False):
         start_date = self.config.get("start_date")
         if start_date:
             start_date = pendulum.parse(self.config.get("start_date"))
         rep_key = self.get_starting_timestamp(context)
+
+        if is_inclusive:
+            rep_key = rep_key + datetime.timedelta(seconds=1)
 
         # if stream has a minimum start time and start date or replication key is less than the minimum start time, return the minimum start time
         if hasattr(self, "minimum_start_time") and self.minimum_start_time and (rep_key or start_date) < self.minimum_start_time:
