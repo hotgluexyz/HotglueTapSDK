@@ -179,6 +179,9 @@ class PluginCapabilities(CapabilitiesEnum):
     #: A.K.A ``FAST_SYNC``.
     BATCH = "batch"
 
+    # Supports raising hotglue exception classes
+    HOTGLUE_EXCEPTIONS_CLASSES = "hotglue-exceptions-classes"
+
 
 class TapCapabilities(CapabilitiesEnum):
     """Tap-specific capabilities."""
