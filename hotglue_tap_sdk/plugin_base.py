@@ -34,6 +34,7 @@ from hotglue_tap_sdk.helpers.capabilities import (
     STREAM_MAPS_CONFIG,
     CapabilitiesEnum,
     PluginCapabilities,
+    AlertingLevel,
 )
 from hotglue_tap_sdk.mapper import PluginMapper
 from hotglue_tap_sdk.typing import extend_validator_with_defaults
@@ -48,6 +49,7 @@ class PluginBase(metaclass=abc.ABCMeta):
     """Abstract base class for taps."""
 
     name: str  # The executable name of the tap or target plugin.
+    alerting_level: AlertingLevel = AlertingLevel.NONE
 
     config_jsonschema: dict = {}
     # A JSON Schema object defining the config options that this tap will accept.
@@ -277,6 +279,7 @@ class PluginBase(metaclass=abc.ABCMeta):
         """
         print_fn(f"{cls.name} v{cls.plugin_version}, Meltano SDK v{cls.sdk_version}")
 
+
     @classmethod
     def _get_about_info(cls: Type["PluginBase"]) -> Dict[str, Any]:
         """Returns capabilities and other tap metadata.
@@ -290,6 +293,7 @@ class PluginBase(metaclass=abc.ABCMeta):
         info["version"] = cls.plugin_version
         info["sdk_version"] = cls.sdk_version
         info["capabilities"] = cls.capabilities
+        info["alerting_level"] = cls.alerting_level
 
         config_jsonschema = cls.config_jsonschema
         cls.append_builtin_config(config_jsonschema)
