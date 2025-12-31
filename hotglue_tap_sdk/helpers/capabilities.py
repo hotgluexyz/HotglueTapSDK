@@ -179,6 +179,9 @@ class PluginCapabilities(CapabilitiesEnum):
     #: A.K.A ``FAST_SYNC``.
     BATCH = "batch"
 
+    # Supports raising hotglue exception classes
+    HOTGLUE_EXCEPTIONS_CLASSES = "hotglue-exceptions-classes"
+
 
 class TapCapabilities(CapabilitiesEnum):
     """Tap-specific capabilities."""
@@ -224,3 +227,14 @@ class TargetCapabilities(CapabilitiesEnum):
 
     #: Allow setting the target schema.
     TARGET_SCHEMA = "target-schema"
+
+class AlertingLevel(Enum):
+    """
+    The Alerting level to be used when this connector fails on an unexpected error.
+
+    This can be used to prevent too much noise from this connector's failures.
+    """
+
+    WARNING = "warning"
+    ERROR = "error"
+    NONE = "none"
