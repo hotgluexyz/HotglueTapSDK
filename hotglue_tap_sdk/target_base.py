@@ -90,6 +90,7 @@ class Target(PluginBase, SingerReader, metaclass=abc.ABCMeta):
             PluginCapabilities.ABOUT,
             PluginCapabilities.STREAM_MAPS,
             PluginCapabilities.FLATTENING,
+            PluginCapabilities.HOTGLUE_EXCEPTIONS_CLASSES
         ]
 
     @property

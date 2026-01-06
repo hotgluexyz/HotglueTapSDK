@@ -11,6 +11,7 @@ from hotglue_tap_sdk.target_sdk.auth import Authenticator
 from hotglue_tap_sdk.target_sdk.common import HGJSONEncoder
 from singer_sdk.plugin_base import PluginBase
 from singer_sdk.sinks import RecordSink, BatchSink
+from hotglue_etl_exceptions import InvalidCredentialsError, InvalidPayloadError
 import os
 
 class HotglueBaseSink(Rest):
@@ -205,6 +206,9 @@ class HotglueSink(HotglueBaseSink, RecordSink):
         except Exception as e:
             self.logger.exception(f"Upsert record error {str(e)}")
             state_updates['error'] = str(e)
+            if isinstance(e, (InvalidCredentialsError, InvalidPayloadError)):
+                state_updates['hg_error_class'] = e.__class__.__name__
+
 
         if success:
             self.logger.info(f"{self.name} processed id: {id}")
