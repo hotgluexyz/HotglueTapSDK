@@ -89,7 +89,7 @@ class Target(PluginBase, SingerReader, metaclass=abc.ABCMeta):
         return [
             PluginCapabilities.ABOUT,
             PluginCapabilities.STREAM_MAPS,
-            PluginCapabilities.FLATTENING
+            PluginCapabilities.FLATTENING,
         ]
 
     @property

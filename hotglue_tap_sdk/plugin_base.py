@@ -279,7 +279,6 @@ class PluginBase(metaclass=abc.ABCMeta):
         """
         print_fn(f"{cls.name} v{cls.plugin_version}, Meltano SDK v{cls.sdk_version}")
 
-
     @classmethod
     def _get_about_info(cls: Type["PluginBase"]) -> Dict[str, Any]:
         """Returns capabilities and other tap metadata.
