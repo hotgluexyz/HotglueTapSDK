@@ -182,6 +182,7 @@ class HotglueSink(HotglueBaseSink, RecordSink):
         id = None
         external_id = None
         success = None
+        state = {}
         state_updates = dict()
 
         try:
@@ -217,7 +218,7 @@ class HotglueSink(HotglueBaseSink, RecordSink):
             if existing_state:
                 return self.update_state(existing_state, is_duplicate=True, record=record)
 
-            state = {"hash": hash}
+            state["hash"] = hash
 
 
             try:
