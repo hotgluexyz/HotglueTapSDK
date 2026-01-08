@@ -352,13 +352,7 @@ class TargetHotglue(Target):
 
             transformed_record = self.get_record_id(sink.name, transformed_record, sink.relation_fields if hasattr(sink, 'relation_fields') else None)
 
-            if not self.name in sink.allows_externalid and transformed_record.get(self.EXTERNAL_ID_KEY):
-                external_id = transformed_record.pop(self.EXTERNAL_ID_KEY, None)
 
-            transformed_record = sink.preprocess_record(transformed_record, context)
-
-            if transformed_record and external_id:
-                transformed_record[self.EXTERNAL_ID_KEY] = external_id
 
             sink.process_record(transformed_record, context)
             sink._after_process_record(context)
