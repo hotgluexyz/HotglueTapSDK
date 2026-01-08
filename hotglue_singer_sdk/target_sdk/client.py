@@ -9,8 +9,8 @@ from typing import Any, Dict, List, Optional
 from hotglue_singer_sdk.target_sdk.rest import Rest
 from hotglue_singer_sdk.target_sdk.auth import Authenticator
 from hotglue_singer_sdk.target_sdk.common import HGJSONEncoder
-from hotglue_tap_sdk.plugin_base import PluginBase
-from hotglue_tap_sdk.sinks import RecordSink, BatchSink
+from hotglue_singer_sdk.plugin_base import PluginBase
+from hotglue_singer_sdk.sinks import RecordSink, BatchSink
 from hotglue_etl_exceptions import InvalidCredentialsError, InvalidPayloadError
 import os
 

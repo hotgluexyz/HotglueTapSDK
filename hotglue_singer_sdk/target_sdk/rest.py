@@ -6,7 +6,7 @@ import backoff
 import requests
 import json
 from typing import Any, Dict, Optional
-from hotglue_tap_sdk.exceptions import FatalAPIError, RetriableAPIError
+from hotglue_singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 from hotglue_singer_sdk.target_sdk.auth import Authenticator
 from hotglue_singer_sdk.target_sdk.common import HGJSONEncoder
 
