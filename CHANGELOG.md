@@ -572,7 +572,7 @@ and making it broadly available to the community.
 
 ### Changes
 
-- Promote `hotglue_tap_sdk.helpers.typing` to `hotglue_tap_sdk.typing` (#84)
+- Promote `hotglue_singer_sdk.helpers.typing` to `hotglue_singer_sdk.typing` (#84)
 - Modified environment variable parsing logic for arrays (#82)
 - Renamed `http_headers` in `Authenticator` class to `auth_headers` (#75, !47)
 - Expect environment variables in all caps (`<PLUGIN>_<SETTING>`) (#59, !34)

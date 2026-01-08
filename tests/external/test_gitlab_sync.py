@@ -2,8 +2,8 @@
 from typing import Optional
 
 from samples.sample_tap_gitlab.gitlab_tap import SampleTapGitlab
-from hotglue_tap_sdk.helpers import _catalog
-from hotglue_tap_sdk.helpers._singer import Catalog
+from hotglue_singer_sdk.helpers import _catalog
+from hotglue_singer_sdk.helpers._singer import Catalog
 
 COUNTER = 0
 SAMPLE_CONFIG_BAD = {"not": "correct"}

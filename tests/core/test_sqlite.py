@@ -13,12 +13,12 @@ import pytest
 from samples.sample_tap_sqlite import SQLiteConnector, SQLiteTap
 from samples.sample_target_csv.csv_target import SampleTargetCSV
 from samples.sample_target_sqlite import SQLiteSink, SQLiteTarget
-from hotglue_tap_sdk import SQLStream
-from hotglue_tap_sdk import typing as th
-from hotglue_tap_sdk.helpers._singer import Catalog, MetadataMapping, StreamMetadata
-from hotglue_tap_sdk.tap_base import SQLTap
-from hotglue_tap_sdk.target_base import SQLTarget
-from hotglue_tap_sdk.testing import (
+from hotglue_singer_sdk import SQLStream
+from hotglue_singer_sdk import typing as th
+from hotglue_singer_sdk.helpers._singer import Catalog, MetadataMapping, StreamMetadata
+from hotglue_singer_sdk.tap_base import SQLTap
+from hotglue_singer_sdk.target_base import SQLTarget
+from hotglue_singer_sdk.testing import (
     _get_tap_catalog,
     get_standard_tap_tests,
     tap_sync_test,

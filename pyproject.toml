@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "hotglue-tap-sdk"
-version = "1.0.4"
-description = "A framework for building Singer taps"
+name = "hotglue-singer-sdk"
+version = "1.0.0"
+description = "A framework for building Singer taps and targets"
 authors = ["Hotglue Team and Contributors. Original work by Meltano Team and Contributors."]
 maintainers = ["Hotglue Team and Contributors"]
 readme = "README.md"
 homepage = "https://hotglue.com"
-repository = "https://github.com/hotglue/hotgluetapsdk"
+repository = "https://github.com/hotglue/hotgluesingersdk"
 documentation = "https://hotglue.com"
 keywords = [
     "Hotglue",
@@ -44,7 +44,10 @@ inflection = "^0.5.1"
 sqlalchemy = "^1.4"
 python-dotenv = "^0.20.0"
 typing-extensions = "^4.2.0"
-
+pydantic = "2.5.3"
+numpy = "^1.21.6"
+pandas = "^1.3.5"
+hotglue-etl-exceptions = "0.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
@@ -74,11 +77,11 @@ exclude = ".*simpleeval.*"
 [tool.isort]
 profile = "black"
 multi_line_output = 3 # Vertical Hanging Indent
-src_paths = "hotglue_tap_sdk"
+src_paths = "hotglue_singer_sdk"
 known_first_party = ["tests", "samples"]
 
 [tool.pytest.ini_options]
-addopts = '-vvv --ignore=hotglue_tap_sdk/helpers/_simpleeval.py -m "not external"'
+addopts = '-vvv --ignore=hotglue_singer_sdk/helpers/_simpleeval.py -m "not external"'
 markers = [
     "external: Tests relying on external resources",
 ]
@@ -90,15 +93,15 @@ tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
     "docs/conf.py",
     "pyproject.toml:^version =",
-    "cookiecutter/tap-template/{{cookiecutter.tap_id}}/pyproject.toml:hotglue-tap-sdk",
-    "cookiecutter/target-template/{{cookiecutter.target_id}}/pyproject.toml:hotglue-tap-sdk",
+    "cookiecutter/tap-template/{{cookiecutter.tap_id}}/pyproject.toml:hotglue-singer-sdk",
+    "cookiecutter/target-template/{{cookiecutter.target_id}}/pyproject.toml:hotglue-singer-sdk",
     ".github/ISSUE_TEMPLATE/bug.yml:^      placeholder:",
 ]
 
 [tool.coverage.paths]
 source = [
-    "hotglue_tap_sdk/",
-    "*/hotglue_tap_sdk",
+    "hotglue_singer_sdk/",
+    "*/hotglue_singer_sdk",
 ]
 tests = [
     "tests/",
@@ -107,11 +110,11 @@ tests = [
 
 [tool.coverage.run]
 branch = true
-source = ["hotglue_tap_sdk", "tests"]
+source = ["hotglue_singer_sdk", "tests"]
 omit = [
     "tests/*",
     "samples/*",
-    "hotglue_tap_sdk/helpers/_compat.py",
+    "hotglue_singer_sdk/helpers/_compat.py",
 ]
 
 [tool.coverage.report]

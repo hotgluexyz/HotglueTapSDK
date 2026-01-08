@@ -1,8 +1,8 @@
 import os
 from unittest import mock
 
-from hotglue_tap_sdk.plugin_base import PluginBase
-from hotglue_tap_sdk.typing import IntegerType, PropertiesList, Property, StringType
+from hotglue_singer_sdk.plugin_base import PluginBase
+from hotglue_singer_sdk.typing import IntegerType, PropertiesList, Property, StringType
 
 
 class PluginTest(PluginBase):
