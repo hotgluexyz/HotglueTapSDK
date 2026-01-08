@@ -3,9 +3,9 @@
 
 from typing import Any, Dict, List
 
-from hotglue_tap_sdk.streams.core import Stream
-from hotglue_tap_sdk.tap_base import Tap
-from hotglue_tap_sdk.typing import BooleanType, PropertiesList, Property
+from hotglue_singer_sdk.streams.core import Stream
+from hotglue_singer_sdk.tap_base import Tap
+from hotglue_singer_sdk.typing import BooleanType, PropertiesList, Property
 
 SAMPLE_CONFIG: Dict[str, Any] = {}
 

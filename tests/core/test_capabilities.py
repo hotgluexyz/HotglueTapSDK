@@ -3,7 +3,7 @@ from inspect import currentframe, getframeinfo
 
 import pytest
 
-from hotglue_tap_sdk.helpers.capabilities import CapabilitiesEnum
+from hotglue_singer_sdk.helpers.capabilities import CapabilitiesEnum
 
 
 class DummyCapabilitiesEnum(CapabilitiesEnum):

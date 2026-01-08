@@ -7,13 +7,13 @@ from typing import Dict, List, Optional, Set, cast
 
 import pytest
 
-from hotglue_tap_sdk.exceptions import MapExpressionError
-from hotglue_tap_sdk.helpers._catalog import get_selected_schema
-from hotglue_tap_sdk.helpers._singer import Catalog
-from hotglue_tap_sdk.mapper import PluginMapper, RemoveRecordTransform, md5
-from hotglue_tap_sdk.streams.core import Stream
-from hotglue_tap_sdk.tap_base import Tap
-from hotglue_tap_sdk.typing import (
+from hotglue_singer_sdk.exceptions import MapExpressionError
+from hotglue_singer_sdk.helpers._catalog import get_selected_schema
+from hotglue_singer_sdk.helpers._singer import Catalog
+from hotglue_singer_sdk.mapper import PluginMapper, RemoveRecordTransform, md5
+from hotglue_singer_sdk.streams.core import Stream
+from hotglue_singer_sdk.tap_base import Tap
+from hotglue_singer_sdk.typing import (
     IntegerType,
     ObjectType,
     PropertiesList,

@@ -6,8 +6,8 @@ from contextlib import redirect_stdout
 
 import pytest
 
-from hotglue_tap_sdk import Stream, Tap
-from hotglue_tap_sdk.io_base import SingerMessageType
+from hotglue_singer_sdk import Stream, Tap
+from hotglue_singer_sdk.io_base import SingerMessageType
 
 
 class Parent(Stream):

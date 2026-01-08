@@ -4,7 +4,7 @@ from typing import Optional
 
 from samples.sample_tap_google_analytics.ga_tap import SampleTapGoogleAnalytics
 
-CONFIG_FILE = "hotglue_tap_sdk/tests/external/.secrets/google-analytics-config.json"
+CONFIG_FILE = "hotglue_singer_sdk/tests/external/.secrets/google-analytics-config.json"
 
 
 def test_tap_class(ga_config: Optional[dict]):
