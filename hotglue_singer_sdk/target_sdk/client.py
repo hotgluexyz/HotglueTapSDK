@@ -179,35 +179,55 @@ class HotglueSink(HotglueBaseSink, RecordSink):
         if not self.latest_state:
             self.init_state()
 
-        hash = self.build_record_hash(record)
-
-        if hash in self.processed_hashes:
-            self.logger.info(f"Record of type {self.name} already exists with hash: {hash}")
-            return
-
-        existing_state =  self.get_existing_state(hash)
-
-        if self.name in self.allows_externalid:
-            external_id = record.get("externalId")
-        else:
-            external_id = record.pop("externalId", None)
-
-        if existing_state:
-            return self.update_state(existing_state, is_duplicate=True, record=record)
-
-        state = {"hash": hash}
-
         id = None
-        success = False
+        external_id = None
+        success = None
+        state = {}
         state_updates = dict()
 
         try:
-            id, success, state_updates = self.upsert_record(record, context)
+            if not self.name in self.allows_externalid and record.get(self._target.EXTERNAL_ID_KEY):
+                external_id = record.pop(self._target.EXTERNAL_ID_KEY, None)
+
+            record = self.preprocess_record(record, context)
+
+            if record and external_id:
+                record[self._target.EXTERNAL_ID_KEY] = external_id
         except Exception as e:
-            self.logger.exception(f"Upsert record error {str(e)}")
+            success = False
+            self.logger.exception(f"Preprocess record error {str(e)}")
             state_updates['error'] = str(e)
             if isinstance(e, (InvalidCredentialsError, InvalidPayloadError)):
                 state_updates['hg_error_class'] = e.__class__.__name__
+
+        if success is not False:
+
+            hash = self.build_record_hash(record)
+
+            if hash in self.processed_hashes:
+                self.logger.info(f"Record of type {self.name} already exists with hash: {hash}")
+                return
+
+            existing_state =  self.get_existing_state(hash)
+
+            if self.name in self.allows_externalid:
+                external_id = record.get("externalId")
+            else:
+                external_id = record.pop("externalId", None)
+
+            if existing_state:
+                return self.update_state(existing_state, is_duplicate=True, record=record)
+
+            state["hash"] = hash
+
+
+            try:
+                id, success, state_updates = self.upsert_record(record, context)
+            except Exception as e:
+                self.logger.exception(f"Upsert record error {str(e)}")
+                state_updates['error'] = str(e)
+                if isinstance(e, (InvalidCredentialsError, InvalidPayloadError)):
+                    state_updates['hg_error_class'] = e.__class__.__name__
 
 
         if success:
