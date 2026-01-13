@@ -220,6 +220,18 @@ class TargetHotglue(Target):
                 ):
                     continue
 
+                ref_external_id = record.get(field)
+                if ref_external_id:
+                    sink_bookmarks = (self._latest_state or {}).get("bookmarks", {}).get(sink_name)
+                    cur_record_state = next(
+                        (x for x in sink_bookmarks if x.get("externalId") == ref_external_id),
+                        None
+                    ) if sink_bookmarks else None
+                    
+                    if cur_record_state and cur_record_state.get("id"):
+                        record[field] = cur_record_state.get("id")
+                        continue
+
                 relation_snapshot = None
 
                 relation_path_csv = f"{SNAPSHOT_DIR}/{object_name}_{flow_id}.snapshot.csv"
