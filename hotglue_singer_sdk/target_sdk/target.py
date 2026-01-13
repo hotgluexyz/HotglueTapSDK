@@ -222,7 +222,7 @@ class TargetHotglue(Target):
 
                 ref_external_id = record.get(field)
                 if ref_external_id:
-                    sink_bookmarks = (self._latest_state or {}).get("bookmarks", {}).get(sink_name)
+                    sink_bookmarks = (self._latest_state or {}).get("bookmarks", {}).get(object_name)
                     cur_record_state = next(
                         (x for x in sink_bookmarks if x.get("externalId") == ref_external_id),
                         None
