@@ -405,6 +405,11 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             help="Run the tap in discovery mode.",
         )
         @click.option(
+            "--get-access-token",
+            is_flag=True,
+            help="Get access token and refresh token.",
+        )
+        @click.option(
             "--test",
             is_flag=False,
             flag_value=CliTestOptionValue.All.value,
@@ -433,6 +438,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             version: bool = False,
             about: bool = False,
             discover: bool = False,
+            get_access_token: bool = False,
             test: CliTestOptionValue = CliTestOptionValue.Disabled,
             config: Tuple[str, ...] = (),
             state: str = None,
@@ -445,6 +451,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                 version: Display the package version.
                 about: Display package metadata and settings.
                 discover: Run the tap in discovery mode.
+                get_access_token: Get access token and refresh token.
                 test: Test connectivity by syncing a single record and exiting.
                 format: Specify output style for `--about`.
                 config: Configuration file location or 'ENV' to use environment
@@ -457,6 +464,14 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             """
             if version:
                 cls.print_version()
+                return
+
+            if get_access_token:
+                token_output = {
+                    "access_token": "some-access-token",
+                    "refresh_token": "some-refresh-token"
+                }
+                print(json.dumps(token_output))
                 return
 
             if not about:
