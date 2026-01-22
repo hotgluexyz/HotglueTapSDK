@@ -7,6 +7,7 @@ import os
 import pydantic
 import json
 from abc import abstractmethod
+from __future__ import annotations
 from io import FileIO
 from pathlib import Path, PurePath
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union, IO
@@ -433,7 +434,7 @@ class TargetHotglue(Target):
         """
         self.logger.info(f"Target '{self.name}' is listening for input from tap.")
         
-        stats: dict[str, int] = defaultdict(int)
+        stats: Dict[str, int] = defaultdict(int)
         for line in file_input:
             # Check if shutdown has been requested
             if hasattr(self, '_shutdown_requested') and self._shutdown_requested.is_set():
