@@ -1,5 +1,6 @@
 """HotglueTarget target class."""
 
+from __future__ import annotations
 import click
 import copy
 import time
@@ -7,7 +8,6 @@ import os
 import pydantic
 import json
 from abc import abstractmethod
-from __future__ import annotations
 from io import FileIO
 from pathlib import Path, PurePath
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union, IO
