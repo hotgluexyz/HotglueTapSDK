@@ -74,6 +74,11 @@ class HotglueBaseSink(Rest):
 
         # remove failed records from the previous state so retrigger retries those records
         if self.previous_state:
+            if not self.previous_state.get("bookmarks"):
+                self.previous_state["bookmarks"] = {}
+            if not self.previous_state.get("summary"):
+                self.previous_state["summary"] = {}
+
             for stream in self.previous_state["bookmarks"]:
                 self.previous_state["bookmarks"][stream] = [record for record in self.previous_state["bookmarks"][stream] if record.get("success") != False]
             for stream in self.previous_state["summary"]:
@@ -89,7 +94,7 @@ class HotglueBaseSink(Rest):
         
         # if previous state exists, add the hashes to the processed_hashes
         if self.previous_state:
-            self.processed_hashes.extend([record["hash"] for record in self.previous_state["bookmarks"][self.name] if record.get("hash")])
+            self.processed_hashes.extend([record["hash"] for record in self.previous_state.get("bookmarks", {}).get(self.name, [])] if record.get("hash")])
 
         # get the full target state
         target_state = self._target._latest_state
