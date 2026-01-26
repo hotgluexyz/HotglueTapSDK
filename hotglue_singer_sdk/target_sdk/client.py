@@ -94,7 +94,7 @@ class HotglueBaseSink(Rest):
         
         # if previous state exists, add the hashes to the processed_hashes
         if self.previous_state:
-            self.processed_hashes.extend([record["hash"] for record in self.previous_state.get("bookmarks", {}).get(self.name, [])] if record.get("hash")])
+            self.processed_hashes.extend([record["hash"] for record in self.previous_state.get("bookmarks", {}).get(self.name, []) if record.get("hash")])
 
         # get the full target state
         target_state = self._target._latest_state
