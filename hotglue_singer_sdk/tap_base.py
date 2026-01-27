@@ -556,7 +556,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                 from hotglue_singer_sdk.authenticators import OAuthAuthenticator
 
                 allows_fetch_access_token = False
-                if hasattr(cls, "oauth_authenticator") and cls.oauth_authenticator:
+                if hasattr(cls, "authenticator") and cls.authenticator:
                     allows_fetch_access_token = True
                 cls.print_about(format=format, allows_fetch_access_token=allows_fetch_access_token)
                 return
@@ -592,7 +592,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             )
 
             if access_token:
-                if hasattr(cls, "oauth_authenticator") and cls.oauth_authenticator:
+                if hasattr(cls, "authenticator") and cls.authenticator:
                     # Check if a config file path is available for writing updated tokens
                     if tap.config_file is None:
                         print(json.dumps({
@@ -605,7 +605,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                     try:
                         # If the tap has a use_auth_dummy_stream method, use it to create a dummy stream
                         # normally used for taps with dynamic catalogs
-                        if hasattr(tap, "use_auth_dummy_stream"):
+                        if hasattr(tap, "auth_endpoint") and tap.auth_endpoint:
                             class DummyStream:
                                 def __init__(self, tap):
                                     self._tap = tap
