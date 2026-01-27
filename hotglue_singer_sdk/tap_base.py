@@ -551,22 +551,8 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                 from hotglue_singer_sdk.authenticators import OAuthAuthenticator
 
                 allows_fetch_access_token = False
-                try:
-                    # Try to instantiate tap to check authenticator
-                    temp_tap = cls(
-                        config=None,
-                        parse_env_config=False,
-                        validate_config=False,
-                    )
-                    stream = next(iter(temp_tap.streams.values()), None)
-                    if stream and hasattr(stream, "authenticator"):
-                        authenticator = stream.authenticator
-                        allows_fetch_access_token = isinstance(
-                            authenticator, OAuthAuthenticator
-                        ) or hasattr(authenticator, "update_access_token")
-                except Exception:
-                    # If we can't instantiate, default to False
-                    pass
+                if hasattr(cls, "oauth_authenticator") and cls.oauth_authenticator:
+                    allows_fetch_access_token = True
                 cls.print_about(format=format, allows_fetch_access_token=allows_fetch_access_token)
                 return
 
