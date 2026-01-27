@@ -587,7 +587,15 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             )
 
             if access_token:
-                if cls.oauth_authenticator:
+                if hasattr(cls, "oauth_authenticator") and cls.oauth_authenticator:
+                    # Check if a config file path is available for writing updated tokens
+                    if tap.config_file is None:
+                        print(json.dumps({
+                            "error": "The --access-token flag requires a config file path. "
+                                     "Please provide a path to a config file instead of "
+                                     "using --config ENV or omitting the config."
+                        }, indent=2))
+                        return
                     stream = next(iter(tap.streams.values()))
                     try:
                         stream.authenticator.update_access_token()
