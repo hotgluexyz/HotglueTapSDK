@@ -587,13 +587,8 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             )
 
             if access_token:
-                # Refresh the OAuth access token using the first stream's authenticator
-                from hotglue_singer_sdk.authenticators import OAuthAuthenticator
-
-                stream = next(iter(tap.streams.values()))
-                if hasattr(stream, "authenticator") and isinstance(
-                    stream.authenticator, OAuthAuthenticator
-                ):
+                if cls.oauth_authenticator:
+                    stream = next(iter(tap.streams.values()))
                     try:
                         stream.authenticator.update_access_token()
                         # Print the updated config on success
