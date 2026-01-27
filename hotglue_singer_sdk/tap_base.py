@@ -596,7 +596,10 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                                      "using --config ENV or omitting the config."
                         }, indent=2))
                         return
-                    stream = next(iter(tap.streams.values()))
+                    if hasattr(tap, "base_stream"):
+                        stream = tap.base_stream
+                    else:
+                        stream = next(iter(tap.streams.values()))
                     try:
                         stream.authenticator.update_access_token()
                         # Print the updated config on success
