@@ -385,6 +385,22 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         for stream in self.streams.values():
             stream.log_sync_costs()
 
+    @classmethod
+    def print_about(
+        cls,
+        format: Optional[str] = None,
+        allows_fetch_access_token: bool = False,
+    ) -> None:
+        """Print capabilities and other tap metadata.
+
+        Args:
+            format: Render option for the plugin information.
+            allows_refresh_token: Whether the tap supports OAuth token refresh.
+        """
+        info = cls._get_about_info()
+        info["allows_fetch_access_token"] = allows_fetch_access_token
+
+        super().print_about(format=format)
     # Command Line Execution
 
     @classproperty
@@ -425,6 +441,12 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             help="Use a bookmarks file for incremental replication.",
             type=click.Path(),
         )
+        @click.option(
+            "--access-token",
+            "access_token",
+            is_flag=True,
+            help="Refresh the OAuth access token and update the config file.",
+        )
         @click.command(
             help="Execute the Singer tap.",
             context_settings={"help_option_names": ["--help"]},
@@ -438,6 +460,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             state: str = None,
             catalog: str = None,
             format: str = None,
+            access_token: bool = False,
         ) -> None:
             """Handle command line execution.
 
@@ -451,6 +474,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                     variables. Accepts multiple inputs as a tuple.
                 catalog: Use a Singer catalog file with the tap.",
                 state: Use a bookmarks file for incremental replication.
+                access_token: Refresh the OAuth access token and update the config.
 
             Raises:
                 FileNotFoundError: If the config file does not exist.
@@ -461,12 +485,9 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
 
             if not about:
                 cls.print_version(print_fn=cls.logger.info)
-            else:
-                cls.print_about(format=format)
-                return
 
             validate_config: bool = True
-            if discover:
+            if discover or about:
                 # Don't abort on validation failures
                 validate_config = False
 
@@ -494,6 +515,36 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                 parse_env_config=parse_env_config,
                 validate_config=validate_config,
             )
+
+            if about:
+                # Check if tap uses OAuth authenticator for allows_refresh_token
+                from hotglue_singer_sdk.authenticators import OAuthAuthenticator
+
+                allows_fetch_access_token = False
+                stream = next(iter(tap.streams.values()), None)
+                if stream and hasattr(stream, "authenticator"):
+                    allows_fetch_access_token = isinstance(
+                        stream.authenticator, OAuthAuthenticator
+                    )
+                cls.print_about(format=format, allows_fetch_access_token=allows_fetch_access_token)
+                return
+
+            if access_token:
+                # Refresh the OAuth access token using the first stream's authenticator
+                from hotglue_singer_sdk.authenticators import OAuthAuthenticator
+
+                stream = next(iter(tap.streams.values()))
+                if hasattr(stream, "authenticator") and isinstance(
+                    stream.authenticator, OAuthAuthenticator
+                ):
+                    try:
+                        stream.authenticator.update_access_token()
+                        # Print the updated config on success
+                        print(json.dumps(dict(tap.config), indent=2, default=str))
+                    except Exception as ex:
+                        # Print the error on failure
+                        print(json.dumps({"error": str(ex)}, indent=2))
+                return
 
             if discover:
                 tap.run_discovery()
