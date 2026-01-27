@@ -2,6 +2,7 @@
 
 import abc
 import json
+import sys
 from enum import Enum
 from pathlib import Path, PurePath
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, cast
@@ -77,6 +78,10 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         self._state: Dict[str, Stream] = {}
         self._catalog: Optional[Catalog] = None  # Tap's working catalog
         self.config_file = config[0] if config else None
+
+        # Skip heavy initialization when only refreshing access token
+        if "--access-token" in sys.argv:
+            return
 
         # Process input catalog
         if isinstance(catalog, Catalog):
@@ -596,17 +601,32 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                                      "using --config ENV or omitting the config."
                         }, indent=2))
                         return
-                    if hasattr(tap, "base_stream"):
-                        stream = tap.base_stream
-                    else:
-                        stream = next(iter(tap.streams.values()))
+                    
                     try:
-                        stream.authenticator.update_access_token()
-                        # Print the updated config on success
+                        # If the tap has a use_auth_dummy_stream method, use it to create a dummy stream
+                        # normally used for taps with dynamic catalogs
+                        if hasattr(tap, "use_auth_dummy_stream"):
+                            class DummyStream:
+                                def __init__(self, tap):
+                                    self._tap = tap
+                                    self.logger = tap.logger
+                            stream = DummyStream(tap)
+                            auth = tap.authenticator(
+                                stream=stream,
+                                config_file=tap.config_file,
+                                auth_endpoint=tap.auth_endpoint,
+                            )
+                        # Otherwise, use the first stream
+                        else:
+                            stream = next(iter(tap.streams.values()))
+                            auth = stream.authenticator
+
+                        # Update the access token
+                        auth.update_access_token()
                         print(json.dumps(dict(tap.config), indent=2, default=str))
                     except Exception as ex:
-                        # Print the error on failure
                         print(json.dumps({"error": str(ex)}, indent=2))
+
                 return
 
             if discover:
