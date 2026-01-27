@@ -395,12 +395,72 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
 
         Args:
             format: Render option for the plugin information.
-            allows_refresh_token: Whether the tap supports OAuth token refresh.
+            allows_fetch_access_token: Whether the tap supports OAuth token refresh.
         """
         info = cls._get_about_info()
         info["allows_fetch_access_token"] = allows_fetch_access_token
 
-        super().print_about(format=format)
+        if format == "json":
+            print(json.dumps(info, indent=2, default=str))
+
+        elif format == "markdown":
+            max_setting_len = cast(
+                int, max(len(k) for k in info["settings"]["properties"].keys())
+            )
+
+            # Set table base for markdown
+            table_base = (
+                f"| {'Setting':{max_setting_len}}| Required | Default | Description |\n"
+                f"|:{'-' * max_setting_len}|:--------:|:-------:|:------------|\n"
+            )
+
+            # Empty list for string parts
+            md_list = []
+            # Get required settings for table
+            required_settings = info["settings"].get("required", [])
+
+            # Iterate over Dict to set md
+            md_list.append(
+                f"# `{info['name']}`\n\n"
+                f"{info['description']}\n\n"
+                f"Built with the [Meltano SDK](https://sdk.meltano.com) for "
+                "Singer Taps and Targets.\n\n"
+            )
+            for key, value in info.items():
+
+                if key == "capabilities":
+                    capabilities = f"## {key.title()}\n\n"
+                    capabilities += "\n".join([f"* `{v}`" for v in value])
+                    capabilities += "\n\n"
+                    md_list.append(capabilities)
+
+                if key == "settings":
+                    setting = f"## {key.title()}\n\n"
+                    for k, v in info["settings"].get("properties", {}).items():
+                        md_description = v.get("description", "").replace("\n", "<BR/>")
+                        table_base += (
+                            f"| {k}{' ' * (max_setting_len - len(k))}"
+                            f"| {'True' if k in required_settings else 'False':8} | "
+                            f"{v.get('default', 'None'):7} | "
+                            f"{md_description:11} |\n"
+                        )
+                    setting += table_base
+                    setting += (
+                        "\n"
+                        + "\n".join(
+                            [
+                                "A full list of supported settings and capabilities "
+                                f"is available by running: `{info['name']} --about`"
+                            ]
+                        )
+                        + "\n"
+                    )
+                    md_list.append(setting)
+
+            print("".join(md_list))
+        else:
+            formatted = "\n".join([f"{k.title()}: {v}" for k, v in info.items()])
+            print(formatted)
     # Command Line Execution
 
     @classproperty
@@ -486,8 +546,32 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             if not about:
                 cls.print_version(print_fn=cls.logger.info)
 
+            # Handle --about: check for OAuth without requiring config
+            if about:
+                from hotglue_singer_sdk.authenticators import OAuthAuthenticator
+
+                allows_fetch_access_token = False
+                try:
+                    # Try to instantiate tap to check authenticator
+                    temp_tap = cls(
+                        config=None,
+                        parse_env_config=False,
+                        validate_config=False,
+                    )
+                    stream = next(iter(temp_tap.streams.values()), None)
+                    if stream and hasattr(stream, "authenticator"):
+                        authenticator = stream.authenticator
+                        allows_fetch_access_token = isinstance(
+                            authenticator, OAuthAuthenticator
+                        ) or hasattr(authenticator, "update_access_token")
+                except Exception:
+                    # If we can't instantiate, default to False
+                    pass
+                cls.print_about(format=format, allows_fetch_access_token=allows_fetch_access_token)
+                return
+
             validate_config: bool = True
-            if discover or about:
+            if discover:
                 # Don't abort on validation failures
                 validate_config = False
 
@@ -515,19 +599,6 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                 parse_env_config=parse_env_config,
                 validate_config=validate_config,
             )
-
-            if about:
-                # Check if tap uses OAuth authenticator for allows_refresh_token
-                from hotglue_singer_sdk.authenticators import OAuthAuthenticator
-
-                allows_fetch_access_token = False
-                stream = next(iter(tap.streams.values()), None)
-                if stream and hasattr(stream, "authenticator"):
-                    allows_fetch_access_token = isinstance(
-                        stream.authenticator, OAuthAuthenticator
-                    )
-                cls.print_about(format=format, allows_fetch_access_token=allows_fetch_access_token)
-                return
 
             if access_token:
                 # Refresh the OAuth access token using the first stream's authenticator
