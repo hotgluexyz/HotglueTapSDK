@@ -231,8 +231,11 @@ class HotglueSink(HotglueBaseSink, RecordSink):
             except Exception as e:
                 self.logger.exception(f"Upsert record error {str(e)}")
                 state_updates['error'] = str(e)
-                if isinstance(e, (InvalidCredentialsError, InvalidPayloadError)):
-                    state_updates['hg_error_class'] = e.__class__.__name__
+                success = False
+                if isinstance(e, (InvalidCredentialsError)):
+                    state_updates['hg_error_class'] = InvalidCredentialsError.__name__
+                elif isinstance(e, (InvalidPayloadError)):
+                    state_updates['hg_error_class'] = InvalidPayloadError.__name__
 
 
         if success:
