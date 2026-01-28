@@ -179,6 +179,14 @@ class HotglueSink(HotglueBaseSink, RecordSink):
     def preprocess_record(self, record: dict, context: dict) -> dict:
         raise NotImplementedError()
 
+
+    def _get_error_classification_metadata(self, error: Exception) -> dict:
+        if isinstance(error, (InvalidCredentialsError)):
+            return {"hg_error_class": InvalidCredentialsError.__name__}
+        elif isinstance(error, (InvalidPayloadError)):
+            return {"hg_error_class": InvalidPayloadError.__name__}
+        return {}
+
     def process_record(self, record: dict, context: dict) -> None:
         """Process the record."""
         if not self.latest_state:
@@ -202,8 +210,7 @@ class HotglueSink(HotglueBaseSink, RecordSink):
             success = False
             self.logger.exception(f"Preprocess record error {str(e)}")
             state_updates['error'] = str(e)
-            if isinstance(e, (InvalidCredentialsError, InvalidPayloadError)):
-                state_updates['hg_error_class'] = e.__class__.__name__
+            state_updates.update(self._get_error_classification_metadata(e))
 
         if success is not False:
 
@@ -232,10 +239,7 @@ class HotglueSink(HotglueBaseSink, RecordSink):
                 self.logger.exception(f"Upsert record error {str(e)}")
                 state_updates['error'] = str(e)
                 success = False
-                if isinstance(e, (InvalidCredentialsError)):
-                    state_updates['hg_error_class'] = InvalidCredentialsError.__name__
-                elif isinstance(e, (InvalidPayloadError)):
-                    state_updates['hg_error_class'] = InvalidPayloadError.__name__
+                state_updates.update(self._get_error_classification_metadata(e))
 
 
         if success:
