@@ -280,6 +280,19 @@ class PluginBase(metaclass=abc.ABCMeta):
         print_fn(f"{cls.name} v{cls.plugin_version}, Meltano SDK v{cls.sdk_version}")
 
     @classmethod
+    def confirm_fetch_access_token_support(cls: Type["PluginBase"]) -> bool:
+        """Check if fetch access token support is implemented.
+
+        Returns:
+            True if fetch access token support is implemented, False otherwise.
+        """
+        try:
+            cls.access_token_support()
+        except NotImplementedError:
+            return False
+        return True
+
+    @classmethod
     def _get_about_info(cls: Type["PluginBase"]) -> Dict[str, Any]:
         """Returns capabilities and other tap metadata.
 
@@ -291,9 +304,17 @@ class PluginBase(metaclass=abc.ABCMeta):
         info["description"] = cls.__doc__
         info["version"] = cls.plugin_version
         info["sdk_version"] = cls.sdk_version
-        info["capabilities"] = cls.capabilities
         info["alerting_level"] = cls.alerting_level.value
 
+        capabilities = cls.capabilities
+        # confirm fetch access token capability if cls has confirm_fetch_access_token_support method and it's not NotImplementedError
+        if not cls.confirm_fetch_access_token_support():
+            capabilities.remove(PluginCapabilities.ALLOWS_FETCH_ACCESS_TOKEN)
+        
+        # add capabilities to info
+        info["capabilities"] = capabilities
+
+        # add settings to info
         config_jsonschema = cls.config_jsonschema
         cls.append_builtin_config(config_jsonschema)
         info["settings"] = config_jsonschema
