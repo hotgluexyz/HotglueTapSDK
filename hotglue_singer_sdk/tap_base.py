@@ -278,12 +278,14 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         Returns:
             None
         """
+
         # If the tap has a use_auth_dummy_stream method, use it to create a dummy stream
         # normally used for taps with dynamic catalogs
         class DummyStream:
             def __init__(self, cls):
                 self._tap = cls
                 self.logger = cls.logger
+
         stream = DummyStream(cls)
         auth = authenticator(
             stream=stream,

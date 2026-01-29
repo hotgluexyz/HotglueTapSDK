@@ -310,7 +310,7 @@ class PluginBase(metaclass=abc.ABCMeta):
         # confirm fetch access token capability if cls has confirm_fetch_access_token_support method and it's not NotImplementedError
         if not cls.confirm_fetch_access_token_support():
             capabilities.remove(PluginCapabilities.ALLOWS_FETCH_ACCESS_TOKEN)
-        
+
         # add capabilities to info
         info["capabilities"] = capabilities
 
@@ -386,7 +386,6 @@ class PluginBase(metaclass=abc.ABCMeta):
                 "Singer Taps and Targets.\n\n"
             )
             for key, value in info.items():
-
                 if key == "capabilities":
                     capabilities = f"## {key.title()}\n\n"
                     capabilities += "\n".join([f"* `{v}`" for v in value])
@@ -444,13 +443,18 @@ class PluginBase(metaclass=abc.ABCMeta):
         authenticator, auth_endpoint = cls.access_token_support()
         # Check if a config file path is available for writing updated tokens
         if cls.config_file is None:
-            print(json.dumps({
-                "error": "The --access-token flag requires a config file path. "
+            print(
+                json.dumps(
+                    {
+                        "error": "The --access-token flag requires a config file path. "
                         "Please provide a path to a config file instead of "
                         "using --config ENV or omitting the config."
-            }, indent=2))
+                    },
+                    indent=2,
+                )
+            )
             return
-        
+
         try:
             cls.update_access_token(authenticator, auth_endpoint)
             access_token = {"access_token": cls.config.get("access_token")}
