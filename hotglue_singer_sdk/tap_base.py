@@ -296,7 +296,8 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         )
 
         # Update the access token
-        auth.update_access_token()
+        if not auth.is_token_valid():
+            auth.update_access_token()
 
     @final
     def load_streams(self) -> List[Stream]:
