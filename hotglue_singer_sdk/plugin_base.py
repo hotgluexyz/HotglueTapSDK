@@ -304,15 +304,8 @@ class PluginBase(metaclass=abc.ABCMeta):
         info["description"] = cls.__doc__
         info["version"] = cls.plugin_version
         info["sdk_version"] = cls.sdk_version
+        info["capabilities"] = cls.capabilities
         info["alerting_level"] = cls.alerting_level.value
-
-        capabilities = cls.capabilities
-        # confirm fetch access token capability if cls has confirm_fetch_access_token_support method and it's not NotImplementedError
-        if not cls.confirm_fetch_access_token_support():
-            capabilities.remove(PluginCapabilities.ALLOWS_FETCH_ACCESS_TOKEN)
-
-        # add capabilities to info
-        info["capabilities"] = capabilities
 
         # add settings to info
         config_jsonschema = cls.config_jsonschema
