@@ -28,7 +28,11 @@ class MyTap(Tap):
         Returns:
             A tuple of (authenticator_class, auth_endpoint).
         """
-        return (MyOAuthAuthenticator, "https://api.myservice.com/oauth/token")
+        default_url = "https://api.myservice.com/oauth/token"
+        # ommit if token url is not dynamic
+        dynamic_url = connector.config.get("auth_url")
+        url = dynamic_url or default_url
+        return (MyOAuthAuthenticator, url)
 ```
 
 ### Authenticator Requirements
