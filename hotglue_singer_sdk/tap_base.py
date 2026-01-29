@@ -79,34 +79,32 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         self._catalog: Optional[Catalog] = None  # Tap's working catalog
         self.config_file = config[0] if config else None
 
-        # Skip heavy initialization when only refreshing access token
-        if "--access-token" in sys.argv:
-            return
+        # INSERT_YOUR_CODE
+        # If --discover or --sync in sys.argv, continue the normal constructor execution
+        if "--discover" in sys.argv or "--sync" in sys.argv:
+            if isinstance(catalog, Catalog):
+                self._input_catalog = catalog
+            elif isinstance(catalog, dict):
+                self._input_catalog = Catalog.from_dict(catalog)
+            elif catalog is not None:
+                self._input_catalog = Catalog.from_dict(read_json_file(catalog))
 
-        # Process input catalog
-        if isinstance(catalog, Catalog):
-            self._input_catalog = catalog
-        elif isinstance(catalog, dict):
-            self._input_catalog = Catalog.from_dict(catalog)
-        elif catalog is not None:
-            self._input_catalog = Catalog.from_dict(read_json_file(catalog))
+            # Initialize mapper
+            self.mapper: PluginMapper
+            self.mapper = PluginMapper(
+                plugin_config=dict(self.config),
+                logger=self.logger,
+            )
 
-        # Initialize mapper
-        self.mapper: PluginMapper
-        self.mapper = PluginMapper(
-            plugin_config=dict(self.config),
-            logger=self.logger,
-        )
+            self.mapper.register_raw_streams_from_catalog(self.catalog)
 
-        self.mapper.register_raw_streams_from_catalog(self.catalog)
-
-        # Process state
-        state_dict: dict = {}
-        if isinstance(state, dict):
-            state_dict = state
-        elif state:
-            state_dict = read_json_file(state)
-        self.load_state(state_dict)
+            # Process state
+            state_dict: dict = {}
+            if isinstance(state, dict):
+                state_dict = state
+            elif state:
+                state_dict = read_json_file(state)
+            self.load_state(state_dict)
 
     # Class properties
 
@@ -171,15 +169,18 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         Returns:
             A list of capabilities supported by this tap.
         """
-        return [
+        capabilities = [
             TapCapabilities.CATALOG,
             TapCapabilities.STATE,
             TapCapabilities.DISCOVER,
             PluginCapabilities.ABOUT,
             PluginCapabilities.STREAM_MAPS,
             PluginCapabilities.FLATTENING,
-            PluginCapabilities.ALLOWS_FETCH_ACCESS_TOKEN,
         ]
+
+        if self.confirm_fetch_access_token_support():
+            capabilities.append(PluginCapabilities.ALLOWS_FETCH_ACCESS_TOKEN)
+        return capabilities
 
     # Connection test:
 

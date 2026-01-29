@@ -90,7 +90,6 @@ class Target(PluginBase, SingerReader, metaclass=abc.ABCMeta):
             PluginCapabilities.ABOUT,
             PluginCapabilities.STREAM_MAPS,
             PluginCapabilities.FLATTENING,
-            PluginCapabilities.ALLOWS_FETCH_ACCESS_TOKEN,
         ]
 
     @property
