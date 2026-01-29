@@ -51,7 +51,7 @@ class SignalListenerThread(threading.Thread):
                 f.write(f"Thread ID: {threading.get_ident()}\n")
                 f.write(f"Process ID: {os.getpid()}\n")
         except Exception as e:
-            print(f"Failed to create signal listener file: {e}")
+            self.logger.error(f"Failed to create signal listener file: {e}")
         
         # Wait for shutdown event
         self.shutdown_event.wait()
@@ -150,7 +150,6 @@ class TargetHotglue(Target):
 
         # Set up signal handler in main thread (signal handling only works in main thread)
         def signal_handler(signum, frame):
-            print(f"Received signal {signum}")
             self.logger.info(f"Received signal {signum}. Initiating graceful shutdown...")
             self._shutdown_requested.set()
             
