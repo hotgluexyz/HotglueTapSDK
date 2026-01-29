@@ -421,6 +421,59 @@ class PluginBase(metaclass=abc.ABCMeta):
             formatted = "\n".join([f"{k.title()}: {v}" for k, v in info.items()])
             print(formatted)
 
+    @classmethod
+    def access_token_support(cls: Type["PluginBase"]) -> None:
+        """Get access token support.
+
+        Returns:
+            A tuple of the authenticator class and the auth endpoint.
+        """
+        raise NotImplementedError()
+
+    @classmethod
+    def fetch_access_token(cls: Type["PluginBase"]) -> None:
+        """Fetch access token.
+
+        Returns:
+            A tuple of the authenticator class and the auth endpoint.
+        """
+        if not cls.confirm_fetch_access_token_support():
+            print({"error": "Fetch access token support is not implemented"})
+            return
+
+        authenticator, auth_endpoint = cls.access_token_support()
+        # Check if a config file path is available for writing updated tokens
+        if cls.config_file is None:
+            print(json.dumps({
+                "error": "The --access-token flag requires a config file path. "
+                        "Please provide a path to a config file instead of "
+                        "using --config ENV or omitting the config."
+            }, indent=2))
+            return
+        
+        try:
+            # Current logic only supports taps
+            # If the tap has a use_auth_dummy_stream method, use it to create a dummy stream
+            # normally used for taps with dynamic catalogs
+            class DummyStream:
+                def __init__(self, cls):
+                    self._tap = cls
+                    self.logger = cls.logger
+            stream = DummyStream(cls)
+            auth = authenticator(
+                stream=stream,
+                config_file=cls.config_file,
+                auth_endpoint=auth_endpoint,
+            )
+
+            # Update the access token
+            auth.update_access_token()
+            print(json.dumps(dict(cls.config), indent=2, default=str))
+        except Exception as ex:
+            print(json.dumps({"error": str(ex)}, indent=2))
+
+        return
+
     @classproperty
     def cli(cls) -> Callable:
         """Handle command line execution.

@@ -508,42 +508,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             )
 
             if access_token:
-                if hasattr(cls, "authenticator") and cls.authenticator:
-                    # Check if a config file path is available for writing updated tokens
-                    if tap.config_file is None:
-                        print(json.dumps({
-                            "error": "The --access-token flag requires a config file path. "
-                                     "Please provide a path to a config file instead of "
-                                     "using --config ENV or omitting the config."
-                        }, indent=2))
-                        return
-                    
-                    try:
-                        # If the tap has a use_auth_dummy_stream method, use it to create a dummy stream
-                        # normally used for taps with dynamic catalogs
-                        if hasattr(tap, "auth_endpoint") and tap.auth_endpoint:
-                            class DummyStream:
-                                def __init__(self, tap):
-                                    self._tap = tap
-                                    self.logger = tap.logger
-                            stream = DummyStream(tap)
-                            auth = tap.authenticator(
-                                stream=stream,
-                                config_file=tap.config_file,
-                                auth_endpoint=tap.auth_endpoint,
-                            )
-                        # Otherwise, use the first stream
-                        else:
-                            stream = next(iter(tap.streams.values()))
-                            auth = stream.authenticator
-
-                        # Update the access token
-                        auth.update_access_token()
-                        print(json.dumps(dict(tap.config), indent=2, default=str))
-                    except Exception as ex:
-                        print(json.dumps({"error": str(ex)}, indent=2))
-
-                return
+                return cls.fetch_access_token()
 
             if discover:
                 tap.run_discovery()
