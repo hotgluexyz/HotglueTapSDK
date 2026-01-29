@@ -2,6 +2,7 @@
 
 import abc
 import json
+import sys
 from enum import Enum
 from pathlib import Path, PurePath
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, cast
@@ -77,6 +78,10 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         self._state: Dict[str, Stream] = {}
         self._catalog: Optional[Catalog] = None  # Tap's working catalog
         self.config_file = config[0] if config else None
+
+        # Skip heavy initialization when only refreshing access token
+        if "--access-token" in sys.argv:
+            return
 
         # Process input catalog
         if isinstance(catalog, Catalog):
@@ -385,6 +390,82 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         for stream in self.streams.values():
             stream.log_sync_costs()
 
+    @classmethod
+    def print_about(
+        cls,
+        format: Optional[str] = None,
+        allows_fetch_access_token: bool = False,
+    ) -> None:
+        """Print capabilities and other tap metadata.
+
+        Args:
+            format: Render option for the plugin information.
+            allows_fetch_access_token: Whether the tap supports OAuth token refresh.
+        """
+        info = cls._get_about_info()
+        info["allows_fetch_access_token"] = allows_fetch_access_token
+
+        if format == "json":
+            print(json.dumps(info, indent=2, default=str))
+
+        elif format == "markdown":
+            max_setting_len = cast(
+                int, max(len(k) for k in info["settings"]["properties"].keys())
+            )
+
+            # Set table base for markdown
+            table_base = (
+                f"| {'Setting':{max_setting_len}}| Required | Default | Description |\n"
+                f"|:{'-' * max_setting_len}|:--------:|:-------:|:------------|\n"
+            )
+
+            # Empty list for string parts
+            md_list = []
+            # Get required settings for table
+            required_settings = info["settings"].get("required", [])
+
+            # Iterate over Dict to set md
+            md_list.append(
+                f"# `{info['name']}`\n\n"
+                f"{info['description']}\n\n"
+                f"Built with the [Meltano SDK](https://sdk.meltano.com) for "
+                "Singer Taps and Targets.\n\n"
+            )
+            for key, value in info.items():
+
+                if key == "capabilities":
+                    capabilities = f"## {key.title()}\n\n"
+                    capabilities += "\n".join([f"* `{v}`" for v in value])
+                    capabilities += "\n\n"
+                    md_list.append(capabilities)
+
+                if key == "settings":
+                    setting = f"## {key.title()}\n\n"
+                    for k, v in info["settings"].get("properties", {}).items():
+                        md_description = v.get("description", "").replace("\n", "<BR/>")
+                        table_base += (
+                            f"| {k}{' ' * (max_setting_len - len(k))}"
+                            f"| {'True' if k in required_settings else 'False':8} | "
+                            f"{v.get('default', 'None'):7} | "
+                            f"{md_description:11} |\n"
+                        )
+                    setting += table_base
+                    setting += (
+                        "\n"
+                        + "\n".join(
+                            [
+                                "A full list of supported settings and capabilities "
+                                f"is available by running: `{info['name']} --about`"
+                            ]
+                        )
+                        + "\n"
+                    )
+                    md_list.append(setting)
+
+            print("".join(md_list))
+        else:
+            formatted = "\n".join([f"{k.title()}: {v}" for k, v in info.items()])
+            print(formatted)
     # Command Line Execution
 
     @classproperty
@@ -425,6 +506,12 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             help="Use a bookmarks file for incremental replication.",
             type=click.Path(),
         )
+        @click.option(
+            "--access-token",
+            "access_token",
+            is_flag=True,
+            help="Refresh the OAuth access token and update the config file.",
+        )
         @click.command(
             help="Execute the Singer tap.",
             context_settings={"help_option_names": ["--help"]},
@@ -438,6 +525,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             state: str = None,
             catalog: str = None,
             format: str = None,
+            access_token: bool = False,
         ) -> None:
             """Handle command line execution.
 
@@ -451,6 +539,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                     variables. Accepts multiple inputs as a tuple.
                 catalog: Use a Singer catalog file with the tap.",
                 state: Use a bookmarks file for incremental replication.
+                access_token: Refresh the OAuth access token and update the config.
 
             Raises:
                 FileNotFoundError: If the config file does not exist.
@@ -461,8 +550,15 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
 
             if not about:
                 cls.print_version(print_fn=cls.logger.info)
-            else:
-                cls.print_about(format=format)
+
+            # Handle --about: check for OAuth without requiring config
+            if about:
+                from hotglue_singer_sdk.authenticators import OAuthAuthenticator
+
+                allows_fetch_access_token = False
+                if hasattr(cls, "authenticator") and cls.authenticator:
+                    allows_fetch_access_token = True
+                cls.print_about(format=format, allows_fetch_access_token=allows_fetch_access_token)
                 return
 
             validate_config: bool = True
@@ -494,6 +590,44 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                 parse_env_config=parse_env_config,
                 validate_config=validate_config,
             )
+
+            if access_token:
+                if hasattr(cls, "authenticator") and cls.authenticator:
+                    # Check if a config file path is available for writing updated tokens
+                    if tap.config_file is None:
+                        print(json.dumps({
+                            "error": "The --access-token flag requires a config file path. "
+                                     "Please provide a path to a config file instead of "
+                                     "using --config ENV or omitting the config."
+                        }, indent=2))
+                        return
+                    
+                    try:
+                        # If the tap has a use_auth_dummy_stream method, use it to create a dummy stream
+                        # normally used for taps with dynamic catalogs
+                        if hasattr(tap, "auth_endpoint") and tap.auth_endpoint:
+                            class DummyStream:
+                                def __init__(self, tap):
+                                    self._tap = tap
+                                    self.logger = tap.logger
+                            stream = DummyStream(tap)
+                            auth = tap.authenticator(
+                                stream=stream,
+                                config_file=tap.config_file,
+                                auth_endpoint=tap.auth_endpoint,
+                            )
+                        # Otherwise, use the first stream
+                        else:
+                            stream = next(iter(tap.streams.values()))
+                            auth = stream.authenticator
+
+                        # Update the access token
+                        auth.update_access_token()
+                        print(json.dumps(dict(tap.config), indent=2, default=str))
+                    except Exception as ex:
+                        print(json.dumps({"error": str(ex)}, indent=2))
+
+                return
 
             if discover:
                 tap.run_discovery()
