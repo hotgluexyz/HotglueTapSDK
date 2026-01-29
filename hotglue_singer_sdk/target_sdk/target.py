@@ -36,10 +36,11 @@ SNAPSHOT_DIR = os.environ.get('SNAPSHOT_DIR') or f"/home/hotglue/{job_id}/snapsh
 class SignalListenerThread(threading.Thread):
     """Simple background thread that listens for SIGUSR1 signals."""
     
-    def __init__(self, shutdown_event):
+    def __init__(self, shutdown_event, logger):
         super().__init__(daemon=True)
         self.shutdown_event = shutdown_event
         self.signal_listener_file = "user_signal.listener"
+        self.logger = logger
         
     def run(self):
         """Create signal listener file and listen for SIGUSR1."""
@@ -157,7 +158,7 @@ class TargetHotglue(Target):
         signal.signal(signal.SIGUSR1, signal_handler)
         
         # Start signal listener thread
-        self.signal_listener_thread = SignalListenerThread(self._shutdown_requested)
+        self.signal_listener_thread = SignalListenerThread(self._shutdown_requested, self.logger)
         self.signal_listener_thread.start()
 
     def _save_failed_job_state(self):
