@@ -272,7 +272,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         )
 
     @classmethod
-    def update_access_token(cls, authenticator, auth_endpoint) -> None:
+    def update_access_token(cls, authenticator, auth_endpoint, tap) -> None:
         """Update the access token.
 
         Returns:
@@ -282,14 +282,16 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         # If the tap has a use_auth_dummy_stream method, use it to create a dummy stream
         # normally used for taps with dynamic catalogs
         class DummyStream:
-            def __init__(self, cls):
-                self._tap = cls
-                self.logger = cls.logger
+            def __init__(self, tap):
+                self._tap = tap
+                self.logger = tap.logger
+                self.tap_name = tap.name
+                self.config = tap.config
 
-        stream = DummyStream(cls)
+        stream = DummyStream(tap)
         auth = authenticator(
             stream=stream,
-            config_file=cls.config_file,
+            config_file=tap.config_file,
             auth_endpoint=auth_endpoint,
         )
 
@@ -533,7 +535,7 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             )
 
             if access_token:
-                return cls.fetch_access_token()
+                return cls.fetch_access_token(connector=tap)
 
             if discover:
                 tap.run_discovery()

@@ -430,7 +430,7 @@ class PluginBase(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @classmethod
-    def fetch_access_token(cls: Type["PluginBase"]) -> dict:
+    def fetch_access_token(cls: Type["PluginBase"], connector) -> dict:
         """Fetch access token.
 
         Returns:
@@ -442,7 +442,7 @@ class PluginBase(metaclass=abc.ABCMeta):
 
         authenticator, auth_endpoint = cls.access_token_support()
         # Check if a config file path is available for writing updated tokens
-        if cls.config_file is None:
+        if connector.config_file is None:
             print(
                 json.dumps(
                     {
@@ -456,8 +456,8 @@ class PluginBase(metaclass=abc.ABCMeta):
             return
 
         try:
-            cls.update_access_token(authenticator, auth_endpoint)
-            access_token = {"access_token": cls.config.get("access_token")}
+            cls.update_access_token(authenticator, auth_endpoint, connector)
+            access_token = {"access_token": connector.config.get("access_token")}
             print(json.dumps(dict(access_token), indent=2, default=str))
             return access_token
         except Exception as ex:
