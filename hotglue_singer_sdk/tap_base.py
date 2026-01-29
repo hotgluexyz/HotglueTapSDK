@@ -79,32 +79,32 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
         self._catalog: Optional[Catalog] = None  # Tap's working catalog
         self.config_file = config[0] if config else None
 
-        # INSERT_YOUR_CODE
-        # If --discover or --sync in sys.argv, continue the normal constructor execution
-        if "--discover" in sys.argv or "--sync" in sys.argv:
-            if isinstance(catalog, Catalog):
-                self._input_catalog = catalog
-            elif isinstance(catalog, dict):
-                self._input_catalog = Catalog.from_dict(catalog)
-            elif catalog is not None:
-                self._input_catalog = Catalog.from_dict(read_json_file(catalog))
+    def register_streams_from_catalog(self, catalog):
+        if isinstance(catalog, Catalog):
+            self._input_catalog = catalog
+        elif isinstance(catalog, dict):
+            self._input_catalog = Catalog.from_dict(catalog)
+        elif catalog is not None:
+            self._input_catalog = Catalog.from_dict(read_json_file(catalog))
 
-            # Initialize mapper
-            self.mapper: PluginMapper
-            self.mapper = PluginMapper(
-                plugin_config=dict(self.config),
-                logger=self.logger,
-            )
+        # Initialize mapper
+        self.mapper: PluginMapper
+        self.mapper = PluginMapper(
+            plugin_config=dict(self.config),
+            logger=self.logger,
+        )
 
-            self.mapper.register_raw_streams_from_catalog(self.catalog)
+        self.mapper.register_raw_streams_from_catalog(self.catalog)
 
-            # Process state
-            state_dict: dict = {}
-            if isinstance(state, dict):
-                state_dict = state
-            elif state:
-                state_dict = read_json_file(state)
-            self.load_state(state_dict)
+
+    def register_state_from_file(self, state):
+        state_dict: dict = {}
+        if isinstance(state, dict):
+            state_dict = state
+        elif state:
+            state_dict = read_json_file(state)
+        self.load_state(state_dict)
+
 
     # Class properties
 
@@ -540,6 +540,8 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
                 return cls.fetch_access_token(connector=tap)
 
             if discover:
+                tap.register_streams_from_catalog(catalog)
+                tap.register_state_from_file(state)
                 tap.run_discovery()
                 if test == CliTestOptionValue.All.value:
                     tap.run_connection_test()
@@ -548,6 +550,8 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             elif test == CliTestOptionValue.Schema.value:
                 tap.write_schemas()
             else:
+                tap.register_streams_from_catalog(catalog)
+                tap.register_state_from_file(state)
                 tap.sync_all()
 
         return cli
