@@ -452,23 +452,9 @@ class PluginBase(metaclass=abc.ABCMeta):
             return
         
         try:
-            # Current logic only supports taps
-            # If the tap has a use_auth_dummy_stream method, use it to create a dummy stream
-            # normally used for taps with dynamic catalogs
-            class DummyStream:
-                def __init__(self, cls):
-                    self._tap = cls
-                    self.logger = cls.logger
-            stream = DummyStream(cls)
-            auth = authenticator(
-                stream=stream,
-                config_file=cls.config_file,
-                auth_endpoint=auth_endpoint,
-            )
-
-            # Update the access token
-            auth.update_access_token()
-            print(json.dumps(dict(cls.config), indent=2, default=str))
+            cls.update_access_token(authenticator, auth_endpoint)
+            auth_token = cls.config.get("access_token")
+            print(json.dumps(dict({"access_token": auth_token}), indent=2, default=str))
         except Exception as ex:
             print(json.dumps({"error": str(ex)}, indent=2))
 

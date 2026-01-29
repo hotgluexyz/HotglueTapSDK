@@ -271,6 +271,29 @@ class Tap(PluginBase, metaclass=abc.ABCMeta):
             "Please set the '--catalog' command line argument and try again."
         )
 
+    @classmethod
+    def update_access_token(cls, authenticator, auth_endpoint) -> None:
+        """Update the access token.
+
+        Returns:
+            None
+        """
+        # If the tap has a use_auth_dummy_stream method, use it to create a dummy stream
+        # normally used for taps with dynamic catalogs
+        class DummyStream:
+            def __init__(self, cls):
+                self._tap = cls
+                self.logger = cls.logger
+        stream = DummyStream(cls)
+        auth = authenticator(
+            stream=stream,
+            config_file=cls.config_file,
+            auth_endpoint=auth_endpoint,
+        )
+
+        # Update the access token
+        auth.update_access_token()
+
     @final
     def load_streams(self) -> List[Stream]:
         """Load streams from discovery and initialize DAG.
