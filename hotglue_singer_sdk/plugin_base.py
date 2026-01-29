@@ -437,7 +437,7 @@ class PluginBase(metaclass=abc.ABCMeta):
             A tuple of the authenticator class and the auth endpoint.
         """
         if not cls.confirm_fetch_access_token_support():
-            print({"error": "Fetch access token support is not implemented"})
+            print(json.dumps({"error": "Fetch access token support is not implemented"}, indent=2))
             return
 
         authenticator, auth_endpoint = cls.access_token_support()
