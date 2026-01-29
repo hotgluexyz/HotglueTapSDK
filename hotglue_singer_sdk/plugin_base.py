@@ -421,7 +421,7 @@ class PluginBase(metaclass=abc.ABCMeta):
             print(formatted)
 
     @classmethod
-    def access_token_support(cls: Type["PluginBase"]) -> None:
+    def access_token_support(cls: Type["PluginBase"], connector: Any = None) -> None:
         """Get access token support.
 
         Returns:
@@ -440,7 +440,7 @@ class PluginBase(metaclass=abc.ABCMeta):
             print(json.dumps({"error": "Fetch access token support is not implemented"}, indent=2))
             return
 
-        authenticator, auth_endpoint = cls.access_token_support()
+        authenticator, auth_endpoint = cls.access_token_support(connector)
         # Check if a config file path is available for writing updated tokens
         if connector.config_file is None:
             print(
